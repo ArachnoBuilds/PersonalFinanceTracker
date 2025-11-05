@@ -1,6 +1,6 @@
 <Solution>
   <Folder Name="/UI/">
     <Project Path="UI/Components/Components.csproj" />
+    <Project Path="UI/WebApp/WebApp.csproj" Id="c59c949b-6d31-4d56-8aee-ba3fa98f0082" />
   </Folder>
-  <Project Path="UI/WebApp/WebApp.csproj" Id="c59c949b-6d31-4d56-8aee-ba3fa98f0082" />
 </Solution>
