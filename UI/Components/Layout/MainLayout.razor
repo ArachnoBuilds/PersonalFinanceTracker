@@ -15,12 +15,11 @@
     </RadzenHeader>
     <RadzenSidebar Position="SidebarPosition.Left" @bind-Expanded="@leftSidebarExpanded">
         <RadzenPanelMenu>
-            <RadzenPanelMenuItem Text="Home" Icon="home" />
-            <RadzenPanelMenuItem Text="Users" Icon="account_box" />
+            <RadzenPanelMenuItem Text="Dashboard" Icon="dashboard" Path="/" />
+            <RadzenPanelMenuItem Text="Planner" Icon="date_range" Path="/planner" />
+            <RadzenPanelMenuItem Text="Tracker" Icon="grid_view" Path="#" />
+            <RadzenPanelMenuItem Text="Settings" Icon="settings" Path="#" />
         </RadzenPanelMenu>
-        <div class="rz-p-4">
-            Left Sidebar
-        </div>
     </RadzenSidebar>
     <RadzenBody>
         <div class="rz-p-4">
