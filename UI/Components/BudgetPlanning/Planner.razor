@@ -1,0 +1,13 @@
+﻿@page "/budget-planner"
+
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Normal" Wrap="FlexWrap.Wrap">
+	<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Right" Wrap="FlexWrap.Wrap">
+		<RadzenLabel Text="Year:" />
+		<RadzenDropDown @bind-Value=@selectedYear Data=@years />
+	</RadzenStack>
+	<BudgetSummaryGrid Summaries="@summaries" />
+	<BudgetGrid Data="@incomeGrid" FirstColumnTitle="Income" />
+	<BudgetGrid Data="@expensesGrid" FirstColumnTitle="Expenses" />
+	<BudgetGrid Data="@savingsGrid" FirstColumnTitle="Savings" />
+</RadzenStack>
+
