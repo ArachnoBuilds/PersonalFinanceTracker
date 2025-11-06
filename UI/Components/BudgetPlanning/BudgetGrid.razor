@@ -1,0 +1,45 @@
+﻿<RadzenDataGrid AllowColumnResize="true"
+				Responsive="true"
+				AllowAlternatingRows="true"
+				TItem="AnnualBudget"
+				Data="@Data"
+				Style="overflow:scroll">
+	<Columns>
+		<RadzenDataGridColumn Width="150px"
+							  Title="@FirstColumnTitle"
+							  Property="Category"
+							  Filterable="false"
+							  Sortable="false"
+							  TextAlign="TextAlign.Left"/>
+		@for (int i = 0; i < months.Length; i++)
+		{
+			var month = months[i];
+			<RadzenDataGridColumn Width="50px"
+								  Title="@month.ToString()"
+								  Filterable="false"
+								  Sortable="false"
+								  TextAlign="TextAlign.Right">
+				<Template Context="data">
+					@if (data.Budget.TryGetValue(month, out var value) && value != 0)
+					{
+						@($"{value}")
+					}
+					else
+					{
+						@(" - ")
+					}
+				</Template>
+			</RadzenDataGridColumn>
+		}
+	</Columns>
+</RadzenDataGrid>
+
+@code 
+{
+	[Parameter]
+	public string FirstColumnTitle { get; set; } = "Category";
+	[Parameter]
+	public List<AnnualBudget> Data { get; set; } = [];
+
+	ViewModels.Month[] months = Enum.GetValues<ViewModels.Month>();
+}
