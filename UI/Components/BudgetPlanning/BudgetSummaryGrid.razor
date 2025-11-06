@@ -1,20 +1,20 @@
 ﻿<RadzenDataGrid AllowColumnResize="true"
 				Responsive="true"
 				AllowAlternatingRows="true"
-				TItem="Dictionary<ViewModels.Month, MonthlyBudgetSummary>"
+				TItem="Dictionary<Header, MonthlyBudgetSummary>"
 				Data="@Data"
 				Style="overflow:scroll">
 	<Columns>
-		@for (int i = 0; i < months.Length; i++)
+		@for (int i = 0; i < headers.Length; i++)
 		{
-			var month = months[i];
+			var header = headers[i];
 			<RadzenDataGridColumn Width="50px"
-								  Title="@month.ToString()"
+								  Title="@header.ToString()"
 								  Filterable="false"
 								  Sortable="false"
 								  TextAlign="TextAlign.Right">
 				<Template Context="data">
-					@if (data.TryGetValue(month, out var value))
+					@if (data.TryGetValue(header, out var value))
 					{
 						@($"{value.Balance}")
 					}
@@ -31,8 +31,8 @@
 @code 
 {
 	[Parameter]
-	public Dictionary<ViewModels.Month, MonthlyBudgetSummary> Summaries { get; set; } = [];
+	public Dictionary<Header, MonthlyBudgetSummary> Summaries { get; set; } = [];
 
-	ViewModels.Month[] months = Enum.GetValues<ViewModels.Month>();
-	List<Dictionary<ViewModels.Month, MonthlyBudgetSummary>> Data => [Summaries];
+	Header[] headers = Enum.GetValues<Header>();
+	List<Dictionary<ViewModels.Header, MonthlyBudgetSummary>> Data => [Summaries];
 }

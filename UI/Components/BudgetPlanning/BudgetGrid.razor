@@ -11,16 +11,16 @@
 							  Filterable="false"
 							  Sortable="false"
 							  TextAlign="TextAlign.Left"/>
-		@for (int i = 0; i < months.Length; i++)
+		@for (int i = 0; i < headers.Length; i++)
 		{
-			var month = months[i];
+			var header = headers[i];
 			<RadzenDataGridColumn Width="50px"
-								  Title="@month.ToString()"
+								  Title="@header.ToString()"
 								  Filterable="false"
 								  Sortable="false"
 								  TextAlign="TextAlign.Right">
 				<Template Context="data">
-					@if (data.Budget.TryGetValue(month, out var value) && value != 0)
+					@if (data.Budget.TryGetValue(header, out var value) && value != 0)
 					{
 						@($"{value}")
 					}
@@ -41,5 +41,5 @@
 	[Parameter]
 	public List<AnnualBudget> Data { get; set; } = [];
 
-	ViewModels.Month[] months = Enum.GetValues<ViewModels.Month>();
+	Header[] headers = Enum.GetValues<Header>();
 }

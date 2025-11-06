@@ -1,3 +1,3 @@
 ﻿namespace ViewModels;
 
-public record AnnualBudget(string Category, Dictionary<Month, double> Budget);
+public record AnnualBudget(string Category, Dictionary<Header, double> Budget);

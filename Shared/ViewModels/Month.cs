@@ -1,6 +1,6 @@
 ﻿namespace ViewModels;
 
-public enum Month
+public enum Header
 {
     Jan,
     Feb,
