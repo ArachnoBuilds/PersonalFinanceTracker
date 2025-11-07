@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Services;
 using WebApp;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -10,5 +11,6 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 
 builder.Services.AddScoped<Radzen.DialogService>();
 builder.Services.AddScoped<Radzen.ThemeService>();
+builder.Services.AddScoped<BudgetService>();
 
 await builder.Build().RunAsync();
