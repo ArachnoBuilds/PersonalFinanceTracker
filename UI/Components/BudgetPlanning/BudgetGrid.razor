@@ -1,16 +1,34 @@
-﻿<RadzenDataGrid AllowColumnResize="true"
+﻿<RadzenDataGrid @ref="@grid"
+				AllowColumnResize="true"
 				Responsive="true"
 				AllowAlternatingRows="true"
+				EditMode="DataGridEditMode.Single"
 				TItem="AnnualBudget"
 				Data="@Data"
 				Style="overflow:scroll">
 	<Columns>
-		<RadzenDataGridColumn Width="150px"
-							  Title="@FirstColumnTitle"
-							  Property="Category"
+		<RadzenDataGridColumn Width="100px"
 							  Filterable="false"
 							  Sortable="false"
-							  TextAlign="TextAlign.Left"/>
+							  TextAlign="TextAlign.Left">
+			<HeaderTemplate>
+				<RadzenText TextStyle="TextStyle.Body1">
+					<strong>
+						@FirstColumnTitle
+					</strong>
+				</RadzenText>
+			</HeaderTemplate>
+			<Template Context="data">
+				<RadzenText TextStyle="TextStyle.Body1">
+					<strong>
+						@data.Category
+					</strong>
+				</RadzenText>
+			</Template>
+			<EditTemplate Context="data">
+				<RadzenTextBox Value="@data.Category" />
+			</EditTemplate>
+		</RadzenDataGridColumn>
 		@for (int i = 0; i < headers.Length; i++)
 		{
 			var header = headers[i];
@@ -20,21 +38,43 @@
 								  Sortable="false"
 								  TextAlign="TextAlign.Right">
 				<Template Context="data">
+					@{
+						var isTotal = data.Category == "Total" || header is Header.Total;
+					}
 					@if (data.Budget.TryGetValue(header, out var value) && value != 0)
 					{
-						@($"{value}")
+						@Render(value.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-IN")), isTotal)
 					}
 					else
 					{
-						@(" - ")
+						@Render(" - ", isTotal)
 					}
 				</Template>
+				<EditTemplate Context="data">
+					<RadzenNumeric @bind-Value="@data.Budget[header]" Style="width:100%" Format="C" />
+				</EditTemplate>
 			</RadzenDataGridColumn>
 		}
+		<RadzenDataGridColumn Width="75px"
+							  Filterable="false"
+							  Sortable="false"
+							  TextAlign="TextAlign.Right">
+			<HeaderTemplate>
+				<RadzenButton Icon="add_circle" Text="Add" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Small" Click="@OnAddRow" />
+			</HeaderTemplate>
+			<Template Context="data">
+				<RadzenIcon Icon="edit" />
+				<RadzenIcon Icon="delete" IconStyle="IconStyle.Danger" />
+			</Template>
+			<EditTemplate Context="data">
+				<RadzenIcon Icon="check_circle" IconStyle="IconStyle.Success" />
+				<RadzenIcon Icon="cancel" IconStyle="IconStyle.Danger" />
+			</EditTemplate>
+		</RadzenDataGridColumn>
 	</Columns>
 </RadzenDataGrid>
 
-@code 
+@code
 {
 	[Parameter]
 	public string FirstColumnTitle { get; set; } = "Category";
@@ -42,4 +82,31 @@
 	public List<AnnualBudget> Data { get; set; } = [];
 
 	Header[] headers = Enum.GetValues<Header>();
+	RadzenDataGrid<AnnualBudget>? grid;
+
+	RenderFragment Render(string text, bool isTotal) => __builder =>
+	{
+		@if (isTotal)
+		{
+			<strong>
+				@text
+			</strong>
+		}
+		else
+		{
+			@text
+		}
+	};
+
+
+	async Task OnAddRow()
+	{
+		if (grid == null || !grid.IsValid)
+			return;
+
+		AnnualBudget item = new(
+			string.Empty, 
+			Enum.GetValues<Header>().ToDictionary(h => h, h => 0.0));
+		await grid.InsertRow(item);
+	}
 }
