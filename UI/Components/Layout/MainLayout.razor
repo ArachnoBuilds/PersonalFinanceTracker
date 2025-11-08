@@ -1,43 +1,44 @@
 ﻿@inherits LayoutComponentBase
 
 <HeadContent>
-    <RadzenTheme Theme="material" />
+	<RadzenTheme Theme="material" />
 </HeadContent>
 
 <RadzenDialog />
 
 <RadzenLayout>
-    <RadzenHeader>
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0">
-            <RadzenSidebarToggle Click="@(() => leftSidebarExpanded = !leftSidebarExpanded)" />
-            <RadzenLabel Text="Header" />
-        </RadzenStack>
-    </RadzenHeader>
-    <RadzenSidebar Position="SidebarPosition.Left" @bind-Expanded="@leftSidebarExpanded">
-        <RadzenPanelMenu>
-            <RadzenPanelMenuItem Text="Dashboard" Icon="dashboard" Path="/" />
-            <RadzenPanelMenuItem Text="Budget Planner" Icon="date_range" Path="/budget-planner" />
-            <RadzenPanelMenuItem Text="Budget Tracker" Icon="grid_view" Path="#" />
-            <RadzenPanelMenuItem Text="Settings" Icon="settings" Path="#" />
-        </RadzenPanelMenu>
-    </RadzenSidebar>
-    <RadzenBody>
-        <div class="rz-p-4">
-            @Body
-        </div>
-        <div class="rz-p-4">
-            <RadzenButton Text="Toggle left Sidebar" Click="@(() => leftSidebarExpanded = !leftSidebarExpanded)" />
-            <RadzenButton Text="Toggle right Sidebar" Click="@(() => rightSidebarExpanded = !rightSidebarExpanded)" />
-        </div>
-    </RadzenBody>
-    <RadzenSidebar Position="SidebarPosition.Right" @bind-Expanded="@rightSidebarExpanded" Style="width: 300px;">
-        <div class="rz-p-4">
-            Right Sidebar
-        </div>
-    </RadzenSidebar>
+	<RadzenHeader>
+		<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Stretch" Gap="0">
+			<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0">
+				<RadzenSidebarToggle Click="@(() => leftSidebarExpanded = !leftSidebarExpanded)" />
+				<RadzenLabel Text="Personal Finance Tracker" />
+			</RadzenStack>
+			<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End">
+				<RadzenSidebarToggle Icon="settings" Click="@(() => rightSidebarExpanded = !rightSidebarExpanded)" />
+			</RadzenStack>
+		</RadzenStack>
+	</RadzenHeader>
+	<RadzenSidebar Position="SidebarPosition.Left" @bind-Expanded="@leftSidebarExpanded">
+		<RadzenPanelMenu>
+			<RadzenPanelMenuItem Text="Dashboard" Icon="dashboard" Path="/" />
+			<RadzenPanelMenuItem Text="Budget Planner" Icon="date_range" Path="/budget-planner" />
+			<RadzenPanelMenuItem Text="Budget Tracker" Icon="grid_view" Path="#" />
+			<RadzenPanelMenuItem Text="Settings" Icon="settings" Path="#" />
+		</RadzenPanelMenu>
+	</RadzenSidebar>
+	<RadzenBody>
+		<div class="rz-p-4">
+			@Body
+		</div>
+	</RadzenBody>
+	<RadzenSidebar Position="SidebarPosition.Right" @bind-Expanded="@rightSidebarExpanded" Style="width: 300px;">
+		<div class="rz-p-4">
+			Right Sidebar
+		</div>
+	</RadzenSidebar>
 </RadzenLayout>
 
 @code {
-    bool leftSidebarExpanded = true;
-    bool rightSidebarExpanded = true;
+	bool leftSidebarExpanded = false;
+	bool rightSidebarExpanded = false;
 }
