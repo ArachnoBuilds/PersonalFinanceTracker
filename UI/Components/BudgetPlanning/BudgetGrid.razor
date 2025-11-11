@@ -1,89 +1,334 @@
 ﻿<RadzenDataGrid @ref="@grid"
-				AllowColumnResize="true"
 				Responsive="true"
+				AllowColumnResize="true"
 				AllowAlternatingRows="true"
 				EditMode="DataGridEditMode.Single"
-				TItem="AnnualBudget"
+				RowCreate="@OnCreateAsync"
+				RowUpdate="@OnUpdateAsync"
+				TItem="Budget"
 				Data="@Data"
 				Style="overflow:scroll">
 	<Columns>
-		<RadzenDataGridColumn Width="100px"
-							  Filterable="false"
-							  Sortable="false"
-							  TextAlign="TextAlign.Left">
-			<HeaderTemplate>
-				<RadzenText TextStyle="TextStyle.Body1">
-					<strong>
-						@FirstColumnTitle
-					</strong>
-				</RadzenText>
-			</HeaderTemplate>
-			<Template Context="data">
-				<RadzenText TextStyle="TextStyle.Body1">
-					<strong>
-						@data.Category
-					</strong>
-				</RadzenText>
-			</Template>
-			<EditTemplate Context="data">
-				<RadzenTextBox Value="@data.Category" />
-			</EditTemplate>
-		</RadzenDataGridColumn>
-		@for (int i = 0; i < headers.Length; i++)
+		@if (Type != BudgetType.Summary)
 		{
-			var header = headers[i];
-			<RadzenDataGridColumn Width="50px"
-								  Title="@header.ToString()"
+			<RadzenDataGridColumn Width="100px"
 								  Filterable="false"
 								  Sortable="false"
-								  TextAlign="TextAlign.Right">
+								  TextAlign="TextAlign.Left">
+				<HeaderTemplate>
+					<RadzenText TextStyle="TextStyle.Body1">
+						<strong>
+							@firstColumnHeader
+						</strong>
+					</RadzenText>
+				</HeaderTemplate>
 				<Template Context="data">
-					@{
-						var isTotal = data.Category == "Total" || header is Header.Total;
-					}
-					@if (data.Budget.TryGetValue(header, out var value) && value != 0)
-					{
-						@Render(value.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-IN")), isTotal)
-					}
-					else
-					{
-						@Render(" - ", isTotal)
-					}
+					<RadzenText TextStyle="TextStyle.Body1">
+						<strong>
+							@data.Category
+						</strong>
+					</RadzenText>
 				</Template>
 				<EditTemplate Context="data">
-					<RadzenNumeric @bind-Value="@data.Budget[header]" Style="width:100%" Format="C" />
+					<RadzenAutoComplete Name="Category" @bind-Value=@data.Category Data=@Categories Style="width: 100%" />
+					<RadzenRequiredValidator Component="Category" Text="@($"{firstColumnHeader} category is required")" Popup="true" Style="position: absolute" />
+					<RadzenRegexValidator Component="Category" Text="@($"{firstColumnHeader} category shouldn't conatin any special characters")" Pattern="[a-zA-Z\d ]*" Popup=@true Style="position: absolute" />
 				</EditTemplate>
 			</RadzenDataGridColumn>
 		}
-		<RadzenDataGridColumn Width="75px"
+		<RadzenDataGridColumn Width="50px"
+							  Property="Jan"
+							  Title="Jan"
 							  Filterable="false"
 							  Sortable="false"
 							  TextAlign="TextAlign.Right">
-			<HeaderTemplate>
-				<RadzenButton Icon="add_circle" Text="Add" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Small" Click="@OnAddRow" />
-			</HeaderTemplate>
 			<Template Context="data">
-				<RadzenIcon Icon="edit" />
-				<RadzenIcon Icon="delete" IconStyle="IconStyle.Danger" />
+				@if (data.Jan != 0)
+				{
+					@Render(data.Jan.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-IN")), data.IsTotalCategory)
+				}
+				else
+				{
+					@Render(" - ", data.IsTotalCategory)
+				}
 			</Template>
 			<EditTemplate Context="data">
-				<RadzenIcon Icon="check_circle" IconStyle="IconStyle.Success" />
-				<RadzenIcon Icon="cancel" IconStyle="IconStyle.Danger" />
+				<RadzenNumeric Name="Jan" @bind-Value="@data.Jan" Min="0" Format="#.00" Style="width:100%" />
+				<RadzenNumericRangeValidator Component="Jan" Min="0.00m" Text="Amount can't be less than zero" Popup="true" Style="position: absolute" />
 			</EditTemplate>
 		</RadzenDataGridColumn>
+		<RadzenDataGridColumn Width="50px"
+							  Property="Feb"
+							  Title="Feb"
+							  Filterable="false"
+							  Sortable="false"
+							  TextAlign="TextAlign.Right">
+			<Template Context="data">
+				@if (data.Feb != 0)
+				{
+					@Render(data.Feb.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-IN")), data.IsTotalCategory)
+				}
+				else
+				{
+					@Render(" - ", data.IsTotalCategory)
+				}
+			</Template>
+			<EditTemplate Context="data">
+				<RadzenNumeric Name="Feb" @bind-Value="@data.Feb" Min="0" Format="#.00" Style="width:100%" />
+				<RadzenNumericRangeValidator Component="Feb" Min="0.00m" Text="Amount can't be less than zero" Popup="true" Style="position: absolute" />
+			</EditTemplate>
+		</RadzenDataGridColumn>
+		<RadzenDataGridColumn Width="50px"
+							  Property="Mar"
+							  Title="Mar"
+							  Filterable="false"
+							  Sortable="false"
+							  TextAlign="TextAlign.Right">
+			<Template Context="data">
+				@if (data.Mar != 0)
+				{
+					@Render(data.Mar.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-IN")), data.IsTotalCategory)
+				}
+				else
+				{
+					@Render(" - ", data.IsTotalCategory)
+				}
+			</Template>
+			<EditTemplate Context="data">
+				<RadzenNumeric Name="Mar" @bind-Value="@data.Mar" Min="0" Format="#.00" Style="width:100%" />
+				<RadzenNumericRangeValidator Component="Mar" Min="0.00m" Text="Amount can't be less than zero" Popup="true" Style="position: absolute" />
+			</EditTemplate>
+		</RadzenDataGridColumn>
+		<RadzenDataGridColumn Width="50px"
+							  Property="Apr"
+							  Title="Apr"
+							  Filterable="false"
+							  Sortable="false"
+							  TextAlign="TextAlign.Right">
+			<Template Context="data">
+				@if (data.Apr != 0)
+				{
+					@Render(data.Apr.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-IN")), data.IsTotalCategory)
+				}
+				else
+				{
+					@Render(" - ", data.IsTotalCategory)
+				}
+			</Template>
+			<EditTemplate Context="data">
+				<RadzenNumeric Name="Apr" @bind-Value="@data.Apr" Min="0" Format="#.00" Style="width:100%" />
+				<RadzenNumericRangeValidator Component="Apr" Min="0.00m" Text="Amount can't be less than zero" Popup="true" Style="position: absolute" />
+			</EditTemplate>
+		</RadzenDataGridColumn>
+		<RadzenDataGridColumn Width="50px"
+							  Property="May"
+							  Title="May"
+							  Filterable="false"
+							  Sortable="false"
+							  TextAlign="TextAlign.Right">
+			<Template Context="data">
+				@if (data.May != 0)
+				{
+					@Render(data.May.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-IN")), data.IsTotalCategory)
+				}
+				else
+				{
+					@Render(" - ", data.IsTotalCategory)
+				}
+			</Template>
+			<EditTemplate Context="data">
+				<RadzenNumeric Name="May" @bind-Value="@data.May" Min="0" Format="#.00" Style="width:100%" />
+				<RadzenNumericRangeValidator Component="May" Min="0.00m" Text="Amount can't be less than zero" Popup="true" Style="position: absolute" />
+			</EditTemplate>
+		</RadzenDataGridColumn>
+		<RadzenDataGridColumn Width="50px"
+							  Property="Jun"
+							  Title="Jun"
+							  Filterable="false"
+							  Sortable="false"
+							  TextAlign="TextAlign.Right">
+			<Template Context="data">
+				@if (data.Jun != 0)
+				{
+					@Render(data.Jun.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-IN")), data.IsTotalCategory)
+				}
+				else
+				{
+					@Render(" - ", data.IsTotalCategory)
+				}
+			</Template>
+			<EditTemplate Context="data">
+				<RadzenNumeric Name="Jun" @bind-Value="@data.Jun" Min="0" Format="#.00" Style="width:100%" />
+				<RadzenNumericRangeValidator Component="Jun" Min="0.00m" Text="Amount can't be less than zero" Popup="true" Style="position: absolute" />
+			</EditTemplate>
+		</RadzenDataGridColumn>
+		<RadzenDataGridColumn Width="50px"
+							  Property="Jul"
+							  Title="Jul"
+							  Filterable="false"
+							  Sortable="false"
+							  TextAlign="TextAlign.Right">
+			<Template Context="data">
+				@if (data.Jul != 0)
+				{
+					@Render(data.Jul.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-IN")), data.IsTotalCategory)
+				}
+				else
+				{
+					@Render(" - ", data.IsTotalCategory)
+				}
+			</Template>
+			<EditTemplate Context="data">
+				<RadzenNumeric Name="Jul" @bind-Value="@data.Jul" Min="0" Format="#.00" Style="width:100%" />
+				<RadzenNumericRangeValidator Component="Jul" Min="0.00m" Text="Amount can't be less than zero" Popup="true" Style="position: absolute" />
+			</EditTemplate>
+		</RadzenDataGridColumn>
+		<RadzenDataGridColumn Width="50px"
+							  Property="Aug"
+							  Title="Aug"
+							  Filterable="false"
+							  Sortable="false"
+							  TextAlign="TextAlign.Right">
+			<Template Context="data">
+				@if (data.Aug != 0)
+				{
+					@Render(data.Aug.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-IN")), data.IsTotalCategory)
+				}
+				else
+				{
+					@Render(" - ", data.IsTotalCategory)
+				}
+			</Template>
+			<EditTemplate Context="data">
+				<RadzenNumeric Name="Aug" @bind-Value="@data.Aug" Min="0" Format="#.00" Style="width:100%" />
+				<RadzenNumericRangeValidator Component="Aug" Min="0.00m" Text="Amount can't be less than zero" Popup="true" Style="position: absolute" />
+			</EditTemplate>
+		</RadzenDataGridColumn>
+		<RadzenDataGridColumn Width="50px"
+							  Property="Sep"
+							  Title="Sep"
+							  Filterable="false"
+							  Sortable="false"
+							  TextAlign="TextAlign.Right">
+			<Template Context="data">
+				@if (data.Sep != 0)
+				{
+					@Render(data.Sep.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-IN")), data.IsTotalCategory)
+				}
+				else
+				{
+					@Render(" - ", data.IsTotalCategory)
+				}
+			</Template>
+			<EditTemplate Context="data">
+				<RadzenNumeric Name="Sep" @bind-Value="@data.Sep" Min="0" Format="#.00" Style="width:100%" />
+				<RadzenNumericRangeValidator Component="Sep" Min="0.00m" Text="Amount can't be less than zero" Popup="true" Style="position: absolute" />
+			</EditTemplate>
+		</RadzenDataGridColumn>
+		<RadzenDataGridColumn Width="50px"
+							  Property="Oct"
+							  Title="Oct"
+							  Filterable="false"
+							  Sortable="false"
+							  TextAlign="TextAlign.Right">
+			<Template Context="data">
+				@if (data.Oct != 0)
+				{
+					@Render(data.Oct.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-IN")), data.IsTotalCategory)
+				}
+				else
+				{
+					@Render(" - ", data.IsTotalCategory)
+				}
+			</Template>
+			<EditTemplate Context="data">
+				<RadzenNumeric Name="Oct" @bind-Value="@data.Oct" Min="0" Format="#.00" Style="width:100%" />
+				<RadzenNumericRangeValidator Component="Oct" Min="0.00m" Text="Amount can't be less than zero" Popup="true" Style="position: absolute" />
+			</EditTemplate>
+		</RadzenDataGridColumn>
+		<RadzenDataGridColumn Width="50px"
+							  Property="Nov"
+							  Title="Nov"
+							  Filterable="false"
+							  Sortable="false"
+							  TextAlign="TextAlign.Right">
+			<Template Context="data">
+				@if (data.Nov != 0)
+				{
+					@Render(data.Jan.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-IN")), data.IsTotalCategory)
+				}
+				else
+				{
+					@Render(" - ", data.IsTotalCategory)
+				}
+			</Template>
+			<EditTemplate Context="data">
+				<RadzenNumeric Name="Nov" @bind-Value="@data.Nov" Min="0" Format="#.00" Style="width:100%" />
+				<RadzenNumericRangeValidator Component="Nov" Min="0.00m" Text="Amount can't be less than zero" Popup="true" Style="position: absolute" />
+			</EditTemplate>
+		</RadzenDataGridColumn>
+		<RadzenDataGridColumn Width="50px"
+							  Property="Dec"
+							  Title="Dec"
+							  Filterable="false"
+							  Sortable="false"
+							  TextAlign="TextAlign.Right">
+			<Template Context="data">
+				@if (data.Dec != 0)
+				{
+					@Render(data.Dec.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-IN")), data.IsTotalCategory)
+				}
+				else
+				{
+					@Render(" - ", data.IsTotalCategory)
+				}
+			</Template>
+			<EditTemplate Context="data">
+				<RadzenNumeric Name="Dec" @bind-Value="@data.Dec" Min="0" Format="#.00" Style="width:100%" />
+				<RadzenNumericRangeValidator Component="Dec" Min="0.00m" Text="Amount can't be less than zero" Popup="true" Style="position: absolute" />
+			</EditTemplate>
+		</RadzenDataGridColumn>
+		<RadzenDataGridColumn Width="50px"
+							  Property="Total"
+							  Title="Total"
+							  Filterable="false"
+							  Sortable="false"
+							  TextAlign="TextAlign.Right">
+			<Template Context="data">
+				@if (data.Total != 0)
+				{
+					@Render(data.Total.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-IN")), true)
+				}
+				else
+				{
+					@Render(" - ", true)
+				}
+			</Template>
+		</RadzenDataGridColumn>
+		@if (Type != BudgetType.Summary)
+		{
+			<RadzenDataGridColumn Width="75px"
+								  Filterable="false"
+								  Sortable="false"
+								  TextAlign="TextAlign.Right">
+				<HeaderTemplate>
+					<RadzenButton Icon="add_circle" Text="Add" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Small" Click="@OnAddRowAsync" />
+				</HeaderTemplate>
+				<Template Context="data">
+					<RadzenIcon Icon="edit" @onclick="async (args) => await OnEditRowAsync(data)" Style="cursor:pointer" />
+					<RadzenIcon Icon="delete" IconStyle="IconStyle.Danger" @onclick="async (args) => await OnDeleteAsync(data)" Style="cursor:pointer" />
+				</Template>
+				<EditTemplate Context="data">
+					<RadzenIcon Icon="check_circle" IconStyle="IconStyle.Success" @onclick="async (args) => await OnSaveRowAsync(data)" Style="cursor:pointer" />
+					<RadzenIcon Icon="cancel" IconStyle="IconStyle.Danger" @onclick="async (args) => await OnCancelEditAsync(data)" Style="cursor:pointer" />
+				</EditTemplate>
+			</RadzenDataGridColumn>
+		}
 	</Columns>
 </RadzenDataGrid>
 
 @code
 {
-	[Parameter]
-	public string FirstColumnTitle { get; set; } = "Category";
-	[Parameter]
-	public List<AnnualBudget> Data { get; set; } = [];
-
-	Header[] headers = Enum.GetValues<Header>();
-	RadzenDataGrid<AnnualBudget>? grid;
-
 	RenderFragment Render(string text, bool isTotal) => __builder =>
 	{
 		@if (isTotal)
@@ -97,16 +342,4 @@
 			@text
 		}
 	};
-
-
-	async Task OnAddRow()
-	{
-		if (grid == null || !grid.IsValid)
-			return;
-
-		AnnualBudget item = new(
-			string.Empty, 
-			Enum.GetValues<Header>().ToDictionary(h => h, h => 0.0));
-		await grid.InsertRow(item);
-	}
 }
