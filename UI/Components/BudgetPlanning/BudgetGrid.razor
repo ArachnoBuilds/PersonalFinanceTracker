@@ -43,14 +43,7 @@
 							  Sortable="false"
 							  TextAlign="TextAlign.Right">
 			<Template Context="data">
-				@if (data.Jan != 0)
-				{
-					@Render(data.Jan.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-IN")), data.IsTotalCategory)
-				}
-				else
-				{
-					@Render(" - ", data.IsTotalCategory)
-				}
+				@Render(data.Jan, data.IsTotalCategory)
 			</Template>
 			<EditTemplate Context="data">
 				<RadzenNumeric Name="Jan" @bind-Value="@data.Jan" Min="0" Format="#.00" Style="width:100%" />
@@ -64,14 +57,7 @@
 							  Sortable="false"
 							  TextAlign="TextAlign.Right">
 			<Template Context="data">
-				@if (data.Feb != 0)
-				{
-					@Render(data.Feb.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-IN")), data.IsTotalCategory)
-				}
-				else
-				{
-					@Render(" - ", data.IsTotalCategory)
-				}
+				@Render(data.Feb, data.IsTotalCategory)
 			</Template>
 			<EditTemplate Context="data">
 				<RadzenNumeric Name="Feb" @bind-Value="@data.Feb" Min="0" Format="#.00" Style="width:100%" />
@@ -85,14 +71,7 @@
 							  Sortable="false"
 							  TextAlign="TextAlign.Right">
 			<Template Context="data">
-				@if (data.Mar != 0)
-				{
-					@Render(data.Mar.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-IN")), data.IsTotalCategory)
-				}
-				else
-				{
-					@Render(" - ", data.IsTotalCategory)
-				}
+				@Render(data.Mar, data.IsTotalCategory)
 			</Template>
 			<EditTemplate Context="data">
 				<RadzenNumeric Name="Mar" @bind-Value="@data.Mar" Min="0" Format="#.00" Style="width:100%" />
@@ -106,14 +85,7 @@
 							  Sortable="false"
 							  TextAlign="TextAlign.Right">
 			<Template Context="data">
-				@if (data.Apr != 0)
-				{
-					@Render(data.Apr.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-IN")), data.IsTotalCategory)
-				}
-				else
-				{
-					@Render(" - ", data.IsTotalCategory)
-				}
+				@Render(data.Apr, data.IsTotalCategory)
 			</Template>
 			<EditTemplate Context="data">
 				<RadzenNumeric Name="Apr" @bind-Value="@data.Apr" Min="0" Format="#.00" Style="width:100%" />
@@ -127,14 +99,7 @@
 							  Sortable="false"
 							  TextAlign="TextAlign.Right">
 			<Template Context="data">
-				@if (data.May != 0)
-				{
-					@Render(data.May.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-IN")), data.IsTotalCategory)
-				}
-				else
-				{
-					@Render(" - ", data.IsTotalCategory)
-				}
+				@Render(data.May, data.IsTotalCategory)
 			</Template>
 			<EditTemplate Context="data">
 				<RadzenNumeric Name="May" @bind-Value="@data.May" Min="0" Format="#.00" Style="width:100%" />
@@ -148,14 +113,7 @@
 							  Sortable="false"
 							  TextAlign="TextAlign.Right">
 			<Template Context="data">
-				@if (data.Jun != 0)
-				{
-					@Render(data.Jun.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-IN")), data.IsTotalCategory)
-				}
-				else
-				{
-					@Render(" - ", data.IsTotalCategory)
-				}
+				@Render(data.Jun, data.IsTotalCategory)
 			</Template>
 			<EditTemplate Context="data">
 				<RadzenNumeric Name="Jun" @bind-Value="@data.Jun" Min="0" Format="#.00" Style="width:100%" />
@@ -169,14 +127,7 @@
 							  Sortable="false"
 							  TextAlign="TextAlign.Right">
 			<Template Context="data">
-				@if (data.Jul != 0)
-				{
-					@Render(data.Jul.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-IN")), data.IsTotalCategory)
-				}
-				else
-				{
-					@Render(" - ", data.IsTotalCategory)
-				}
+				@Render(data.Jul, data.IsTotalCategory)
 			</Template>
 			<EditTemplate Context="data">
 				<RadzenNumeric Name="Jul" @bind-Value="@data.Jul" Min="0" Format="#.00" Style="width:100%" />
@@ -190,14 +141,7 @@
 							  Sortable="false"
 							  TextAlign="TextAlign.Right">
 			<Template Context="data">
-				@if (data.Aug != 0)
-				{
-					@Render(data.Aug.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-IN")), data.IsTotalCategory)
-				}
-				else
-				{
-					@Render(" - ", data.IsTotalCategory)
-				}
+				@Render(data.Aug, data.IsTotalCategory)
 			</Template>
 			<EditTemplate Context="data">
 				<RadzenNumeric Name="Aug" @bind-Value="@data.Aug" Min="0" Format="#.00" Style="width:100%" />
@@ -211,14 +155,7 @@
 							  Sortable="false"
 							  TextAlign="TextAlign.Right">
 			<Template Context="data">
-				@if (data.Sep != 0)
-				{
-					@Render(data.Sep.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-IN")), data.IsTotalCategory)
-				}
-				else
-				{
-					@Render(" - ", data.IsTotalCategory)
-				}
+				@Render(data.Sep, data.IsTotalCategory)
 			</Template>
 			<EditTemplate Context="data">
 				<RadzenNumeric Name="Sep" @bind-Value="@data.Sep" Min="0" Format="#.00" Style="width:100%" />
@@ -232,14 +169,7 @@
 							  Sortable="false"
 							  TextAlign="TextAlign.Right">
 			<Template Context="data">
-				@if (data.Oct != 0)
-				{
-					@Render(data.Oct.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-IN")), data.IsTotalCategory)
-				}
-				else
-				{
-					@Render(" - ", data.IsTotalCategory)
-				}
+				@Render(data.Oct, data.IsTotalCategory)
 			</Template>
 			<EditTemplate Context="data">
 				<RadzenNumeric Name="Oct" @bind-Value="@data.Oct" Min="0" Format="#.00" Style="width:100%" />
@@ -253,14 +183,7 @@
 							  Sortable="false"
 							  TextAlign="TextAlign.Right">
 			<Template Context="data">
-				@if (data.Nov != 0)
-				{
-					@Render(data.Jan.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-IN")), data.IsTotalCategory)
-				}
-				else
-				{
-					@Render(" - ", data.IsTotalCategory)
-				}
+				@Render(data.Nov, data.IsTotalCategory)
 			</Template>
 			<EditTemplate Context="data">
 				<RadzenNumeric Name="Nov" @bind-Value="@data.Nov" Min="0" Format="#.00" Style="width:100%" />
@@ -274,14 +197,7 @@
 							  Sortable="false"
 							  TextAlign="TextAlign.Right">
 			<Template Context="data">
-				@if (data.Dec != 0)
-				{
-					@Render(data.Dec.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-IN")), data.IsTotalCategory)
-				}
-				else
-				{
-					@Render(" - ", data.IsTotalCategory)
-				}
+				@Render(data.Dec, data.IsTotalCategory)
 			</Template>
 			<EditTemplate Context="data">
 				<RadzenNumeric Name="Dec" @bind-Value="@data.Dec" Min="0" Format="#.00" Style="width:100%" />
@@ -295,14 +211,7 @@
 							  Sortable="false"
 							  TextAlign="TextAlign.Right">
 			<Template Context="data">
-				@if (data.Total != 0)
-				{
-					@Render(data.Total.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-IN")), true)
-				}
-				else
-				{
-					@Render(" - ", true)
-				}
+				@Render(data.Total, data.IsTotalCategory)
 			</Template>
 		</RadzenDataGridColumn>
 		@if (Type != BudgetType.Summary)
@@ -329,6 +238,17 @@
 
 @code
 {
+	RenderFragment Render(decimal amount, bool isTotalCategory) => __builder =>
+	{
+		@if (amount != 0)
+		{
+			@Render(amount.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-IN")), isTotalCategory)
+		}
+		else
+		{
+			@Render(" - ", isTotalCategory)
+		}
+	};
 	RenderFragment Render(string text, bool isTotal) => __builder =>
 	{
 		@if (isTotal)
