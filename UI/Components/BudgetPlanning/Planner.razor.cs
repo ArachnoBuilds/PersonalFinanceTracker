@@ -23,13 +23,19 @@ public partial class Planner
         incomes = Svc.GetIncomes(selectedYear).ToBudget();
         expenses = Svc.GetExpenses(selectedYear).ToBudget();
         savings = Svc.GetSavings(selectedYear).ToBudget();
-        summaries = [
-                Budget.ToSummaryBudget(
-                    incomes.Find(p => p.IsTotalCategory) ?? Budget.EmptyTotal,
-                    expenses.Find(p => p.IsTotalCategory) ?? Budget.EmptyTotal,
-                    savings.Find(p => p.IsTotalCategory) ?? Budget.EmptyTotal)
-            ];
+        RecalculateSummary();
 
         base.OnInitialized();
+    }
+
+    void RecalculateSummary()
+    {
+        summaries = 
+        [
+            Budget.ToSummaryBudget(
+                incomes.Find(p => p.IsTotalCategory) ?? Budget.EmptyTotal,
+                expenses.Find(p => p.IsTotalCategory) ?? Budget.EmptyTotal,
+                savings.Find(p => p.IsTotalCategory) ?? Budget.EmptyTotal)
+        ];
     }
 }

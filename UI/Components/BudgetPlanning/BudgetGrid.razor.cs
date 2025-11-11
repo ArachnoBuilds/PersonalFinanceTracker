@@ -14,6 +14,11 @@ public partial class BudgetGrid
     public List<string> Categories { get; set; } = [];
     [Parameter]
     public List<Budget> Data { get; set; } = [];
+    [Parameter]
+    public EventCallback<List<Budget>> DataChanged { get; set; }
+    [Parameter]
+    public EventCallback RecalculateBudgetSummary { get; set; }
+
 
     RadzenDataGrid<Budget>? grid;
     string FirstColumnHeader => Type switch
@@ -75,6 +80,7 @@ public partial class BudgetGrid
     {
         Data.Add(budget);
         Budget.RecalculateTotal(Data);
+        await RecalculateBudgetSummary.InvokeAsync();
     }
 
     async Task OnUpdateAsync(Budget budget)
@@ -87,6 +93,7 @@ public partial class BudgetGrid
         Data.Insert(idx, budget);
         Budget.RecalculateTotal(Data);
         editable = null;
+        await RecalculateBudgetSummary.InvokeAsync();
     }
 
     async Task OnDeleteAsync(Budget budget)
@@ -96,6 +103,7 @@ public partial class BudgetGrid
 
         Data.Remove(budget);
         Budget.RecalculateTotal(Data);
+        await RecalculateBudgetSummary.InvokeAsync();
 
         await grid.Reload();
     }
