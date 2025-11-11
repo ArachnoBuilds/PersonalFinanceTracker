@@ -1,4 +1,5 @@
-﻿using ViewModels;
+﻿using Components.ViewModels;
+using ViewModels;
 
 namespace Components.BudgetPlanning;
 
@@ -6,75 +7,101 @@ internal static class Extensions
 {
     extension(List<AnnualBudget> budgets)
     {
-        public void CalculateTotals()
+        public List<Budget> ToBudget()
         {
-            AnnualBudget total = new("Total", []);
+            Budget total = new()
+            {
+                Category = "Total"
+            };
+            List<Budget> returnables = [];
             foreach (var p in budgets)
             {
-                // calculate total for category
-                p.Budget[Header.Total] = p.Budget.Values.Sum();
-
-                // calculate running total for each header
-                foreach (var k in p.Budget.Keys)
+                // convert AnnualBudget to Budget
+                var budget = new Budget
                 {
-                    var amt = total.Budget.TryGetValue(k, out var val) ? val : 0;
-                    total.Budget[k] = amt + p.Budget[k];
-                }
+                    Category = p.Category,
+                    Jan = p.Budgets.GetValueOrDefault(Month.Jan, 0),
+                    Feb = p.Budgets.GetValueOrDefault(Month.Feb, 0),
+                    Mar = p.Budgets.GetValueOrDefault(Month.Mar, 0),
+                    Apr = p.Budgets.GetValueOrDefault(Month.Apr, 0),
+                    May = p.Budgets.GetValueOrDefault(Month.May, 0),
+                    Jun = p.Budgets.GetValueOrDefault(Month.Jun, 0),
+                    Jul = p.Budgets.GetValueOrDefault(Month.Jul, 0),
+                    Aug = p.Budgets.GetValueOrDefault(Month.Aug, 0),
+                    Sep = p.Budgets.GetValueOrDefault(Month.Sep, 0),
+                    Oct = p.Budgets.GetValueOrDefault(Month.Oct, 0),
+                    Nov = p.Budgets.GetValueOrDefault(Month.Nov, 0),
+                    Dec = p.Budgets.GetValueOrDefault(Month.Dec, 0),
+                };
+
+                // calculate totals
+                total.Jan += budget.Jan;
+                total.Feb += budget.Feb;
+                total.Mar += budget.Mar;
+                total.Apr += budget.Apr;
+                total.May += budget.May;
+                total.Jun += budget.Jun;
+                total.Jul += budget.Jul;
+                total.Aug += budget.Aug;
+                total.Sep += budget.Sep;
+                total.Oct += budget.Oct;
+                total.Nov += budget.Nov;
+                total.Dec += budget.Dec;
+
+                returnables.Add(budget);
             }
-            budgets.Add(total);
+
+            returnables.Add(total);
+
+            return returnables;
         }
     }
-
-    extension(MonthlyBudgetSummary)
+    extension(Budget)
     {
-        public static Dictionary<Header, MonthlyBudgetSummary> Calculate(
-            List<AnnualBudget> incomes,
-            List<AnnualBudget> expenses,
-            List<AnnualBudget> savings)
+        public static Budget ToSummaryBudget(
+            Budget income,
+            Budget expense,
+            Budget saving)
         {
-            Dictionary<Header, MonthlyBudgetSummary> summaries = [];
-            var headers = Enum.GetValues<Header>();
-            for (int i = 0; i < headers.Length; i++)
+            if (!income.IsTotalCategory || !expense.IsTotalCategory || !saving.IsTotalCategory)
+                throw new ArgumentException("All budgets must be total categories.");
+            Budget summary = new()
             {
-                var header = headers[i];
+                Jan = income.Jan - expense.Jan - saving.Jan,
+                Feb = income.Feb - expense.Feb - saving.Feb,
+                Mar = income.Mar - expense.Mar - saving.Mar,
+                Apr = income.Apr - expense.Apr - saving.Apr,
+                May = income.May - expense.May - saving.May,
+                Jun = income.Jun - expense.Jun - saving.Jun,
+                Jul = income.Jul - expense.Jul - saving.Jul,
+                Aug = income.Aug - expense.Aug - saving.Aug,
+                Sep = income.Sep - expense.Sep - saving.Sep,
+                Oct = income.Oct - expense.Oct - saving.Oct,
+                Nov = income.Nov - expense.Nov - saving.Nov,
+                Dec = income.Dec - expense.Dec - saving.Dec
+            };
+            return summary;
+        }
 
-                // calulate total income
-                double totalIncome = 0;
-                var income = incomes.Find(p => p.Category == "Total");
-                if (income == null)
-                {
-                    incomes.CalculateTotals();
-                    income = incomes.Find(p => p.Category == "Total");
-                }
-                if (income != null && income.Budget.TryGetValue(header, out var incomeValue))
-                    totalIncome = incomeValue;
+        public static void RecalculateTotal(List<Budget> budgets)
+        {
+            var totalBudget = budgets.FirstOrDefault(b => b.IsTotalCategory);
+            if (totalBudget == null)
+                return;
 
-                // calculate total expenses
-                double totalExpenses = 0;
-                var expense = expenses.Find(p => p.Category == "Total");
-                if (expense == null)
-                {
-                    expenses.CalculateTotals();
-                    expense = expenses.Find(p => p.Category == "Total");
-                }
-                if (expense != null && expense.Budget.TryGetValue(header, out var expenseValue))
-                    totalExpenses = expenseValue;
-
-                // calculate total savings
-                double totalSavings = 0;
-                var saving = savings.Find(p => p.Category == "Total");
-                if (saving == null)
-                {
-                    savings.CalculateTotals();
-                    saving = savings.Find(p => p.Category == "Total");
-                }
-                if (saving != null && saving.Budget.TryGetValue(header, out var savingValue))
-                    totalSavings = savingValue;
-
-                summaries[header] = new(totalIncome, totalExpenses, totalSavings);
-            }
-
-            return summaries;
+            var otherBudgets = budgets.Where(b => !b.IsTotalCategory);
+            totalBudget.Jan = otherBudgets.Sum(b => b.Jan);
+            totalBudget.Feb = otherBudgets.Sum(b => b.Feb);
+            totalBudget.Mar = otherBudgets.Sum(b => b.Mar);
+            totalBudget.Apr = otherBudgets.Sum(b => b.Apr);
+            totalBudget.May = otherBudgets.Sum(b => b.May);
+            totalBudget.Jun = otherBudgets.Sum(b => b.Jun);
+            totalBudget.Jul = otherBudgets.Sum(b => b.Jul);
+            totalBudget.Aug = otherBudgets.Sum(b => b.Aug);
+            totalBudget.Sep = otherBudgets.Sum(b => b.Sep);
+            totalBudget.Oct = otherBudgets.Sum(b => b.Oct);
+            totalBudget.Nov = otherBudgets.Sum(b => b.Nov);
+            totalBudget.Dec = otherBudgets.Sum(b => b.Dec);
         }
     }
 }
