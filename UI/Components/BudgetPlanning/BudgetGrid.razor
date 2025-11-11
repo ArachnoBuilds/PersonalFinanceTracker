@@ -18,7 +18,7 @@
 				<HeaderTemplate>
 					<RadzenText TextStyle="TextStyle.Body1">
 						<strong>
-							@firstColumnHeader
+							@FirstColumnHeader
 						</strong>
 					</RadzenText>
 				</HeaderTemplate>
@@ -31,8 +31,8 @@
 				</Template>
 				<EditTemplate Context="data">
 					<RadzenAutoComplete Name="Category" @bind-Value=@data.Category Data=@Categories Style="width: 100%" />
-					<RadzenRequiredValidator Component="Category" Text="@($"{firstColumnHeader} category is required")" Popup="true" Style="position: absolute" />
-					<RadzenRegexValidator Component="Category" Text="@($"{firstColumnHeader} category shouldn't conatin any special characters")" Pattern="[a-zA-Z\d ]*" Popup=@true Style="position: absolute" />
+					<RadzenRequiredValidator Component="Category" Text="@($"{FirstColumnHeader} category is required")" Popup="true" Style="position: absolute" />
+					<RadzenRegexValidator Component="Category" Text="@($"{FirstColumnHeader} category shouldn't conatin any special characters")" Pattern="[a-zA-Z\d ]*" Popup=@true Style="position: absolute" />
 				</EditTemplate>
 			</RadzenDataGridColumn>
 		}

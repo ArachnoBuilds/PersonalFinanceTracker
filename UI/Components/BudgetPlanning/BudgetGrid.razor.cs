@@ -16,7 +16,7 @@ public partial class BudgetGrid
     public List<Budget> Data { get; set; } = [];
 
     RadzenDataGrid<Budget>? grid;
-    string firstColumnHeader => Type switch
+    string FirstColumnHeader => Type switch
     {
         BudgetType.Income => "Income",
         BudgetType.Expenses => "Expenses",
