@@ -6,5 +6,6 @@
     <Project Path="UI/Components/Components.csproj" />
     <Project Path="UI/Services/Services.csproj" Id="212b6db2-186d-408c-9567-2b548338c2d8" />
     <Project Path="UI/WebApp/WebApp.csproj" Id="c59c949b-6d31-4d56-8aee-ba3fa98f0082" />
+    <Project Path="UI/WebServerApp/WebServerApp.csproj" Id="8aed5563-b00d-4161-9439-537d660e66fe" />
   </Folder>
 </Solution>
