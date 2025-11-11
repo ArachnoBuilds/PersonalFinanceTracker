@@ -246,7 +246,7 @@
 		}
 		else
 		{
-			@Render(" - ", isTotalCategory)
+			@Render(Type is BudgetType.Summary ? "✅" : " - ", isTotalCategory)
 		}
 	};
 	RenderFragment Render(string text, bool isTotal) => __builder =>
