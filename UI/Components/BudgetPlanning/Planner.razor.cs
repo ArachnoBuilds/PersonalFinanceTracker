@@ -1,4 +1,4 @@
-using ViewModels;
+using Components.ViewModels;
 
 namespace Components.BudgetPlanning;
 
@@ -6,10 +6,13 @@ public partial class Planner
 {
     int[] years = [];
     int selectedYear;
-    Dictionary<Header, MonthlyBudgetSummary> summaries = [];
-    List<AnnualBudget> incomeGrid = [];
-    List<AnnualBudget> expensesGrid = [];
-    List<AnnualBudget> savingsGrid = [];
+    List<Budget> summaries = [];
+    List<Budget> incomes = [];
+    List<Budget> expenses = [];
+    List<Budget> savings = [];
+    List<string> incomeCategories = [];
+    List<string> expenseCategories = [];
+    List<string> savingCategories = [];
 
     protected override void OnInitialized()
     {
@@ -17,12 +20,15 @@ public partial class Planner
         selectedYear = 2025;
 
         // fetch budget data for the selected year
-        incomeGrid = Svc.GetIncomes(selectedYear);
-        expensesGrid = Svc.GetExpenses(selectedYear);
-        savingsGrid = Svc.GetSavings(selectedYear);
-
-        // calculate summaries
-        summaries = MonthlyBudgetSummary.Calculate(incomeGrid, expensesGrid, savingsGrid);
+        incomes = Svc.GetIncomes(selectedYear).ToBudget();
+        expenses = Svc.GetExpenses(selectedYear).ToBudget();
+        savings = Svc.GetSavings(selectedYear).ToBudget();
+        summaries = [
+                Budget.ToSummaryBudget(
+                    incomes.Find(p => p.IsTotalCategory) ?? Budget.EmptyTotal,
+                    expenses.Find(p => p.IsTotalCategory) ?? Budget.EmptyTotal,
+                    savings.Find(p => p.IsTotalCategory) ?? Budget.EmptyTotal)
+            ];
 
         base.OnInitialized();
     }

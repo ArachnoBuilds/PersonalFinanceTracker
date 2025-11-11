@@ -6,9 +6,9 @@
 		<RadzenLabel Text="Year:" />
 		<RadzenDropDown @bind-Value=@selectedYear Data=@years />
 	</RadzenStack>
-	<BudgetSummaryGrid Summaries="@summaries" />
-	<BudgetGrid Data="@incomeGrid" FirstColumnTitle="Income" />
-	<BudgetGrid Data="@expensesGrid" FirstColumnTitle="Expenses" />
-	<BudgetGrid Data="@savingsGrid" FirstColumnTitle="Savings" />
+	<BudgetGrid Data="@summaries" Type="BudgetType.Summary" />
+	<BudgetGrid Data="@incomes" Type="BudgetType.Income" Categories="@incomeCategories" />
+	<BudgetGrid Data="@expenses" Type="BudgetType.Expenses" Categories="@expenseCategories" />
+	<BudgetGrid Data="@savings" Type="BudgetType.Savings" Categories="@savingCategories" />
 </RadzenStack>
 
