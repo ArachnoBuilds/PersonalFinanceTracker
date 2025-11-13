@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/Application/Application.csproj" Id="8b109122-9263-4f67-ae62-fc08ed087e8f" />
     <Project Path="src/Components/Components.csproj" />
     <Project Path="src/WebServerApp/WebServerApp.csproj" Id="8aed5563-b00d-4161-9439-537d660e66fe" />
     <Project Path="src/ViewModels/ViewModels.csproj" Id="b404869a-dc7b-4607-96b1-8a98baa5d3c7" />
