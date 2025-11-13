@@ -1,11 +1,13 @@
-﻿<RadzenDataGrid @ref="@grid"
+﻿@using Application.Features.BudgetPlanning.GetBudget.Models
+
+<RadzenDataGrid @ref="@grid"
 				Responsive="true"
 				AllowColumnResize="true"
 				AllowAlternatingRows="true"
 				EditMode="DataGridEditMode.Single"
 				RowCreate="@OnCreateAsync"
 				RowUpdate="@OnUpdateAsync"
-				TItem="Budget"
+				TItem="Models.Budget"
 				Data="@Data"
 				Style="overflow:scroll">
 	<Columns>

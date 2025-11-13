@@ -1,15 +1,13 @@
-using Components.ViewModels;
-
 namespace Components.BudgetPlanning;
 
 public partial class Planner
 {
     int[] years = [];
     int selectedYear;
-    List<Budget> summaries = [];
-    List<Budget> incomes = [];
-    List<Budget> expenses = [];
-    List<Budget> savings = [];
+    List<Models.Budget> summaries = [];
+    List<Models.Budget> incomes = [];
+    List<Models.Budget> expenses = [];
+    List<Models.Budget> savings = [];
     List<string> incomeCategories = [];
     List<string> expenseCategories = [];
     List<string> savingCategories = [];
@@ -32,10 +30,10 @@ public partial class Planner
     {
         summaries = 
         [
-            Budget.ToSummaryBudget(
-                incomes.Find(p => p.IsTotalCategory) ?? Budget.EmptyTotal,
-                expenses.Find(p => p.IsTotalCategory) ?? Budget.EmptyTotal,
-                savings.Find(p => p.IsTotalCategory) ?? Budget.EmptyTotal)
+            Models.Budget.ToSummaryBudget(
+                incomes.Find(p => p.IsTotalCategory) ?? Models.Budget.EmptyTotal,
+                expenses.Find(p => p.IsTotalCategory) ??  Models.Budget.EmptyTotal,
+                savings.Find(p => p.IsTotalCategory) ?? Models.Budget.EmptyTotal)
         ];
     }
 }

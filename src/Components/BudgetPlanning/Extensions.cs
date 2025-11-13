@@ -1,5 +1,4 @@
-﻿using Components.ViewModels;
-using ViewModels;
+﻿using ViewModels;
 
 namespace Components.BudgetPlanning;
 
@@ -7,17 +6,17 @@ internal static class Extensions
 {
     extension(List<AnnualBudget> budgets)
     {
-        public List<Budget> ToBudget()
+        public List<Models.Budget> ToBudget()
         {
-            Budget total = new()
+            Models.Budget total = new()
             {
                 Category = "Total"
             };
-            List<Budget> returnables = [];
+            List<Models.Budget> returnables = [];
             foreach (var p in budgets)
             {
                 // convert AnnualBudget to Budget
-                var budget = new Budget
+                Models.Budget budget = new()
                 {
                     Category = p.Category,
                     Jan = p.Budgets.GetValueOrDefault(Month.Jan, 0),
@@ -56,16 +55,16 @@ internal static class Extensions
             return returnables;
         }
     }
-    extension(Budget)
+    extension(Models.Budget)
     {
-        public static Budget ToSummaryBudget(
-            Budget income,
-            Budget expense,
-            Budget saving)
+        public static Models.Budget ToSummaryBudget(
+            Models.Budget income,
+            Models.Budget expense,
+            Models.Budget saving)
         {
             if (!income.IsTotalCategory || !expense.IsTotalCategory || !saving.IsTotalCategory)
                 throw new ArgumentException("All budgets must be total categories.");
-            Budget summary = new()
+            Models.Budget summary = new()
             {
                 Jan = income.Jan - expense.Jan - saving.Jan,
                 Feb = income.Feb - expense.Feb - saving.Feb,
@@ -83,7 +82,7 @@ internal static class Extensions
             return summary;
         }
 
-        public static void RecalculateTotal(List<Budget> budgets)
+        public static void RecalculateTotal(List<Models.Budget> budgets)
         {
             var totalBudget = budgets.FirstOrDefault(b => b.IsTotalCategory);
             if (totalBudget == null)

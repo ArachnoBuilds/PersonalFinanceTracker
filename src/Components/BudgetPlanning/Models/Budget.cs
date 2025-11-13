@@ -1,4 +1,4 @@
-﻿namespace Components.ViewModels;
+﻿namespace Components.BudgetPlanning.Models;
 
 public record Budget
 {

@@ -1,8 +1,6 @@
-﻿using Components.ViewModels;
+﻿using Application.Features.BudgetPlanning.GetBudget.Models;
 using Microsoft.AspNetCore.Components;
 using Radzen.Blazor;
-using System.Linq;
-using System.Xml.Linq;
 
 namespace Components.BudgetPlanning;
 
@@ -13,14 +11,14 @@ public partial class BudgetGrid
     [Parameter]
     public List<string> Categories { get; set; } = [];
     [Parameter]
-    public List<Budget> Data { get; set; } = [];
+    public List<Models.Budget> Data { get; set; } = [];
     [Parameter]
-    public EventCallback<List<Budget>> DataChanged { get; set; }
+    public EventCallback<List<Models.Budget>> DataChanged { get; set; }
     [Parameter]
     public EventCallback RecalculateBudgetSummary { get; set; }
 
 
-    RadzenDataGrid<Budget>? grid;
+    RadzenDataGrid<Models.Budget>? grid;
     string FirstColumnHeader => Type switch
     {
         BudgetType.Income => "Income",
@@ -28,7 +26,7 @@ public partial class BudgetGrid
         BudgetType.Savings => "Savings",
         _ => string.Empty
     };
-    Budget? editable;
+    Models.Budget? editable;
 
     
 
@@ -46,7 +44,7 @@ public partial class BudgetGrid
         await grid.InsertRow(new());
     }
 
-    async Task OnEditRowAsync(Budget budget)
+    async Task OnEditRowAsync(Models.Budget budget)
     {
         if (grid == null || !grid.IsValid)
             return;
@@ -55,7 +53,7 @@ public partial class BudgetGrid
         await grid.EditRow(budget);
     }
 
-    async Task OnSaveRowAsync(Budget budget)
+    async Task OnSaveRowAsync(Models.Budget budget)
     {
         if (grid == null || !grid.IsValid)
             return;
@@ -63,7 +61,7 @@ public partial class BudgetGrid
         await grid.UpdateRow(budget);
     }
 
-    async Task OnCancelEditAsync(Budget budget)
+    async Task OnCancelEditAsync(Models.    Budget budget)
     {
         if (grid == null)
             return;
@@ -76,14 +74,14 @@ public partial class BudgetGrid
         editable = null;
     }
 
-    async Task OnCreateAsync(Budget budget)
+    async Task OnCreateAsync(Models.Budget budget)
     {
         Data.Add(budget);
-        Budget.RecalculateTotal(Data);
+        Models.Budget.RecalculateTotal(Data);
         await RecalculateBudgetSummary.InvokeAsync();
     }
 
-    async Task OnUpdateAsync(Budget budget)
+    async Task OnUpdateAsync(Models.Budget budget)
     {
         if (editable == null)
             return;
@@ -91,18 +89,18 @@ public partial class BudgetGrid
         var idx = Data.IndexOf(editable);
         Data.Remove(editable);
         Data.Insert(idx, budget);
-        Budget.RecalculateTotal(Data);
+        Models.Budget.RecalculateTotal(Data);
         editable = null;
         await RecalculateBudgetSummary.InvokeAsync();
     }
 
-    async Task OnDeleteAsync(Budget budget)
+    async Task OnDeleteAsync(Models.Budget budget)
     {
         if (grid == null)
             return;
 
         Data.Remove(budget);
-        Budget.RecalculateTotal(Data);
+        Models.Budget.RecalculateTotal(Data);
         await RecalculateBudgetSummary.InvokeAsync();
 
         await grid.Reload();
