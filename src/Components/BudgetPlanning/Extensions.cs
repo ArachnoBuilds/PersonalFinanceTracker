@@ -1,4 +1,4 @@
-﻿using ViewModels;
+﻿using Application.Features.BudgetPlanning.GetBudget.Models;
 
 namespace Components.BudgetPlanning;
 

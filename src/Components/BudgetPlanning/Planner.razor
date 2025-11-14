@@ -1,6 +1,9 @@
-﻿@using Application.Features.BudgetPlanning.GetBudget.Models
+﻿@using Application.Features.BudgetPlanning.GetBudget
+@using Application.Features.BudgetPlanning.GetBudget.Models
+@using Microsoft.Extensions.Logging
 @page "/budget-planner"
-@inject BudgetService Svc
+@inject GetBudgetHandler GetBudgetHandler
+@inject ILogger<Planner> Logger
 
 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Normal" Wrap="FlexWrap.Wrap">
 	<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Right" Wrap="FlexWrap.Wrap">

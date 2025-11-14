@@ -1,4 +1,10 @@
+using Application.Features.BudgetPlanning.GetBudget.Models;
+using Application.Shared;
+using Microsoft.Extensions.Logging;
+
 namespace Components.BudgetPlanning;
+
+using AnnualBudgetsResult = Result<List<AnnualBudget>>;
 
 public partial class Planner
 {
@@ -12,23 +18,44 @@ public partial class Planner
     List<string> expenseCategories = [];
     List<string> savingCategories = [];
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         years = [2025, 2026, 2027, 2028, 2029, 2030];
         selectedYear = 2025;
 
-        // fetch budget data for the selected year
-        incomes = Svc.GetIncomes(selectedYear).ToBudget();
-        expenses = Svc.GetExpenses(selectedYear).ToBudget();
-        savings = Svc.GetSavings(selectedYear).ToBudget();
+        // fetch budgets for the selected year
+        List<Task<AnnualBudgetsResult>> getters = [
+            GetBudgetHandler.DoAsync(new(selectedYear, BudgetType.Income)),
+            GetBudgetHandler.DoAsync(new(selectedYear, BudgetType.Expenses)),
+            GetBudgetHandler.DoAsync(new(selectedYear, BudgetType.Savings))
+        ];
+        await Task.WhenAll(getters);
+        if (getters.Exists(p => p.Result.IsFailure))
+        {
+            getters
+                .FindAll(p => p.Result.IsFailure)
+                .ForEach(p =>
+                {
+                    if (!Logger.IsEnabled(LogLevel.Error))
+                        return;
+                    Logger.LogError("Error fetching budgets for year {Year}: {Error}",
+                        selectedYear,
+                        p.Result.Error);
+                });
+            return;
+        }
+
+        incomes = getters[0].Result.Value.ToBudget();
+        expenses = getters[1].Result.Value.ToBudget();
+        savings = getters[2].Result.Value.ToBudget();
         RecalculateSummary();
 
-        base.OnInitialized();
+        await base.OnInitializedAsync();
     }
 
     void RecalculateSummary()
     {
-        summaries = 
+        summaries =
         [
             Models.Budget.ToSummaryBudget(
                 incomes.Find(p => p.IsTotalCategory) ?? Models.Budget.EmptyTotal,
