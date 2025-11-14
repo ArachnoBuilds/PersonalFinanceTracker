@@ -1,6 +1,6 @@
 ﻿namespace Components.BudgetPlanning.Models;
 
-public record Budget
+public record Budget(int CategoryId)
 {
     public string CategoryDesc { get; set; } = string.Empty;
     public decimal Jan { get; set; } = 0.00m;
@@ -18,7 +18,7 @@ public record Budget
     public decimal Total => Jan + Feb + Mar + Apr + May + Jun + Jul + Aug + Sep + Oct + Nov + Dec;
     public bool IsTotalCategory => CategoryDesc.Equals("Total", StringComparison.InvariantCultureIgnoreCase);
 
-    public static Budget EmptyTotal => new()
+    public static Budget EmptyTotal => new(-1)
     {
         CategoryDesc = "Total"
     };

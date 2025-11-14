@@ -46,7 +46,7 @@ public partial class BudgetGrid
         if (grid == null || !grid.IsValid)
             return;
 
-        await grid.InsertRow(new());
+        await grid.InsertRow(new(-1));
     }
 
     async Task OnEditRowAsync(Models.Budget budget)
