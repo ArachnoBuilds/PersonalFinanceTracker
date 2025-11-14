@@ -1,4 +1,4 @@
-﻿using Application.Features.BudgetPlanning.GetBudget.Models;
+﻿using Application.Shared.Models;
 
 namespace Application.Features.BudgetPlanning.GetBudget;
 

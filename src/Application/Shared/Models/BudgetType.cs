@@ -1,4 +1,4 @@
-﻿namespace Application.Features.BudgetPlanning.GetBudget.Models;
+﻿namespace Application.Shared.Models;
 
 public enum BudgetType
 {

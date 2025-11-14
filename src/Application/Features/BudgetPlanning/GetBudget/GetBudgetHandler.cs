@@ -1,5 +1,6 @@
 ﻿using Application.Features.BudgetPlanning.GetBudget.Models;
 using Application.Shared;
+using Application.Shared.Models;
 using Application.Shared.Persistence;
 using Microsoft.EntityFrameworkCore;
 

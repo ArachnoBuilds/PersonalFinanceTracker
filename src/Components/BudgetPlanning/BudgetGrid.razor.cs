@@ -1,4 +1,4 @@
-﻿using Application.Features.BudgetPlanning.GetBudget.Models;
+﻿using Application.Shared.Models;
 using Microsoft.AspNetCore.Components;
 using Radzen.Blazor;
 
