@@ -88,7 +88,7 @@ public partial class BudgetGrid
     async Task OnCreateAsync(Models.Budget budget)
     {
         var annualBudget = budget.ToAnnualBudget();
-        var result = await CreateBudgetHandler.DoAsync(new(annualBudget)).ConfigureAwait(false);
+        var result = await CreateBudgetHandler.DoAsync(new(Year, Type, annualBudget)).ConfigureAwait(false);
         if (result.IsFailure)
         {
             Logger.LogError("Failed to create budget: {Error}", result.Error);
