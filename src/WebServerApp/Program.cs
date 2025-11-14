@@ -16,6 +16,7 @@ builder.Services
 // Radzen Services
 builder.Services.AddRadzenComponents();
 builder.Services.AddScoped<DialogService>();
+builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<ThemeService>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(
