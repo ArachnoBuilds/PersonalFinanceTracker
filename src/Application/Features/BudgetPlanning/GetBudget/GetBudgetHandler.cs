@@ -4,32 +4,40 @@ using Application.Shared.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Features.BudgetPlanning.GetBudget;
+using CategoryBasedBudget = (string Category, IEnumerable<Budget> Budgets);
 
 public class GetBudgetHandler(ApplicationDbContext context)
 {
     public async Task<Result<List<AnnualBudget>>> DoAsync(GetBudgetQuery query, CancellationToken cancellation = default)
     {
         var (year, type) = (query.Year, query.Type.ToString());
-        List<AnnualBudget> budgets = [];
+        List<AnnualBudget> annualBudgets = [];
         try
         {
-            budgets = await context.Categories
+            // fetch budgets from db
+            var budgets = await context.Categories
                         .AsNoTracking()
                         .Where(p => p.Type == type)
-                        .Select(p => new AnnualBudget(
+                        .Select(p => new CategoryBasedBudget(
                             p.Description,
-                            p.Budgets
-                                .Where(b => b.Year == year)
-                                .ToDictionary(
-                                    b => (Month)b.Month,
-                                    b => (decimal)b.Amount)))
+                            p.Budgets.Where(b => b.Year == year)))
                         .ToListAsync(cancellation)
                         .ConfigureAwait(false);
+
+            // map to annual budgets
+            annualBudgets = [
+                .. budgets
+                .Select(b => new AnnualBudget(
+                    b.Category,
+                    b.Budgets.ToDictionary(
+                        k => (Month)k.Month,
+                        v => (decimal)v.Amount)))
+            ];
         }
         catch (Exception exc)
         {
             return Result.Failure<List<AnnualBudget>>(exc);
         }
-        return budgets;
+        return annualBudgets;
     }
 }
