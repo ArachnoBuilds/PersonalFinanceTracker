@@ -2,6 +2,7 @@ using Application.Features.BudgetPlanning.Models;
 using Application.Shared;
 using Application.Shared.Models;
 using Microsoft.Extensions.Logging;
+using Radzen;
 
 namespace Components.BudgetPlanning;
 
@@ -15,15 +16,20 @@ public partial class Planner
     List<Models.Budget> incomes = [];
     List<Models.Budget> expenses = [];
     List<Models.Budget> savings = [];
-    List<string> incomeCategories = [];
-    List<string> expenseCategories = [];
-    List<string> savingCategories = [];
 
     protected override async Task OnInitializedAsync()
     {
         years = [2025, 2026, 2027, 2028, 2029, 2030];
         selectedYear = 2025;
 
+        // prepare budgets for the selected year
+        await PrepareBudgetsAsync();
+
+        await base.OnInitializedAsync();
+    }
+
+    async Task PrepareBudgetsAsync() 
+    {
         // fetch budgets for the selected year
         List<Task<AnnualBudgetsResult>> getters = [
             GetBudgetHandler.DoAsync(new(selectedYear, BudgetType.Income)),
@@ -31,6 +37,8 @@ public partial class Planner
             GetBudgetHandler.DoAsync(new(selectedYear, BudgetType.Savings))
         ];
         await Task.WhenAll(getters);
+
+        // check for errors
         if (getters.Exists(p => p.Result.IsFailure))
         {
             getters
@@ -44,17 +52,18 @@ public partial class Planner
                         selectedYear,
                         p.Result.Error);
                 });
+            Notifier.Notify(Radzen.NotificationSeverity.Error, NotificationMessages.BudgetFetchFailed);
             return;
         }
 
+        // map then set budgets
         incomes = getters[0].Result.Value.ToBudget();
         expenses = getters[1].Result.Value.ToBudget();
         savings = getters[2].Result.Value.ToBudget();
+
+        // calculate summary
         RecalculateSummary();
-
-        await base.OnInitializedAsync();
     }
-
     void RecalculateSummary()
     {
         summaries =
