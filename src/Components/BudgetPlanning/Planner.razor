@@ -11,13 +11,16 @@
 		<RadzenDropDown @bind-Value=@selectedYear Data=@years />
 	</RadzenStack>
 	<BudgetGrid Data="@summaries" Type="BudgetType.Summary" />
-	<BudgetGrid @bind-Data="@incomes"
+	<BudgetGrid Year="@selectedYear"
+				@bind-Data="@incomes"
 				Type="BudgetType.Income"
 				RecalculateBudgetSummary="@RecalculateSummary" />
-	<BudgetGrid @bind-Data="@expenses"
+	<BudgetGrid Year="@selectedYear"
+				@bind-Data="@expenses"
 				Type="BudgetType.Expenses"
 				RecalculateBudgetSummary="@RecalculateSummary" />
-	<BudgetGrid @bind-Data="@savings"
+	<BudgetGrid Year="@selectedYear"
+				@bind-Data="@savings"
 				Type="BudgetType.Savings"
 				RecalculateBudgetSummary="@RecalculateSummary" />
 </RadzenStack>

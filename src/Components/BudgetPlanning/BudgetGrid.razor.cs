@@ -9,6 +9,8 @@ namespace Components.BudgetPlanning;
 public partial class BudgetGrid
 {
     [Parameter]
+    public int Year { get; set; }
+    [Parameter]
     public BudgetType Type { get; set; } = BudgetType.Summary;
     [Parameter]
     public List<Models.Budget> Data { get; set; } = [];
