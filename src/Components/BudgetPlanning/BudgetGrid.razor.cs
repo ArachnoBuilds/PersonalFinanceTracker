@@ -37,7 +37,7 @@ public partial class BudgetGrid
             }
             categories = getterResult.Value; 
         }
-        categories.RemoveAll(p => Data.Exists(d => d.Category == p));
+        categories.RemoveAll(p => Data.Exists(d => d.CategoryDesc == p));
         await base.OnInitializedAsync();
     }
 

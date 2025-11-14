@@ -10,7 +10,7 @@ internal static class Extensions
         {
             Models.Budget total = new()
             {
-                Category = "Total"
+                CategoryDesc = "Total"
             };
             List<Models.Budget> returnables = [];
             foreach (var p in budgets)
@@ -18,7 +18,7 @@ internal static class Extensions
                 // convert AnnualBudget to Budget
                 Models.Budget budget = new()
                 {
-                    Category = p.CategoryDesc,
+                    CategoryDesc = p.CategoryDesc,
                     Jan = p.Budgets.GetValueOrDefault(Month.Jan, 0),
                     Feb = p.Budgets.GetValueOrDefault(Month.Feb, 0),
                     Mar = p.Budgets.GetValueOrDefault(Month.Mar, 0),

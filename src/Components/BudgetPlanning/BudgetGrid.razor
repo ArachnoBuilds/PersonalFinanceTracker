@@ -31,13 +31,13 @@
 				<Template Context="data">
 					<RadzenText TextStyle="TextStyle.Body1">
 						<strong>
-							@data.Category
+							@data.CategoryDesc
 						</strong>
 					</RadzenText>
 				</Template>
 				<EditTemplate Context="data">
 					<RadzenAutoComplete Name="Category" 
-										@bind-Value=@data.Category 
+										@bind-Value=@data.CategoryDesc 
 										Data=@categories 
 										FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
 										FilterOperator="StringFilterOperator.Contains"

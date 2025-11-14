@@ -2,7 +2,7 @@
 
 public record Budget
 {
-    public string Category { get; set; } = string.Empty;
+    public string CategoryDesc { get; set; } = string.Empty;
     public decimal Jan { get; set; } = 0.00m;
     public decimal Feb { get; set; } = 0.00m;
     public decimal Mar { get; set; } = 0.00m;
@@ -16,10 +16,10 @@ public record Budget
     public decimal Nov { get; set; } = 0.00m;
     public decimal Dec { get; set; } = 0.00m;
     public decimal Total => Jan + Feb + Mar + Apr + May + Jun + Jul + Aug + Sep + Oct + Nov + Dec;
-    public bool IsTotalCategory => Category.Equals("Total", StringComparison.InvariantCultureIgnoreCase);
+    public bool IsTotalCategory => CategoryDesc.Equals("Total", StringComparison.InvariantCultureIgnoreCase);
 
     public static Budget EmptyTotal => new()
     {
-        Category = "Total"
+        CategoryDesc = "Total"
     };
 }
