@@ -1,4 +1,8 @@
-﻿@using Application.Shared.Models
+﻿@using Application.Features.BudgetPlanning.GetCategoryDescription
+@using Application.Shared.Models
+@using Microsoft.Extensions.Logging
+@inject GetCategoryDescriptionHandler GetCategoryDescriptionHandler
+@inject ILogger<BudgetGrid> Logger
 
 <RadzenDataGrid @ref="@grid"
 				Responsive="true"
@@ -32,7 +36,12 @@
 					</RadzenText>
 				</Template>
 				<EditTemplate Context="data">
-					<RadzenAutoComplete Name="Category" @bind-Value=@data.Category Data=@Categories Style="width: 100%" />
+					<RadzenAutoComplete Name="Category" 
+										@bind-Value=@data.Category 
+										Data=@categories 
+										FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
+										FilterOperator="StringFilterOperator.Contains"
+										Style="width: 100%" />
 					<RadzenRequiredValidator Component="Category" Text="@($"{FirstColumnHeader} category is required")" Popup="true" Style="position: absolute" />
 					<RadzenRegexValidator Component="Category" Text="@($"{FirstColumnHeader} category shouldn't conatin any special characters")" Pattern="[a-zA-Z\d ]*" Popup=@true Style="position: absolute" />
 				</EditTemplate>

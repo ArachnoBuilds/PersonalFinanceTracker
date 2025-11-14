@@ -13,15 +13,12 @@
 	<BudgetGrid Data="@summaries" Type="BudgetType.Summary" />
 	<BudgetGrid @bind-Data="@incomes"
 				Type="BudgetType.Income"
-				Categories="@incomeCategories"
 				RecalculateBudgetSummary="@RecalculateSummary" />
 	<BudgetGrid @bind-Data="@expenses"
 				Type="BudgetType.Expenses"
-				Categories="@expenseCategories"
 				RecalculateBudgetSummary="@RecalculateSummary" />
 	<BudgetGrid @bind-Data="@savings"
 				Type="BudgetType.Savings"
-				Categories="@savingCategories"
 				RecalculateBudgetSummary="@RecalculateSummary" />
 </RadzenStack>
 

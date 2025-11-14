@@ -1,5 +1,6 @@
 ﻿using Application.Shared.Models;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Logging;
 using Radzen.Blazor;
 
 namespace Components.BudgetPlanning;
@@ -9,31 +10,35 @@ public partial class BudgetGrid
     [Parameter]
     public BudgetType Type { get; set; } = BudgetType.Summary;
     [Parameter]
-    public List<string> Categories { get; set; } = [];
-    [Parameter]
     public List<Models.Budget> Data { get; set; } = [];
     [Parameter]
     public EventCallback<List<Models.Budget>> DataChanged { get; set; }
     [Parameter]
     public EventCallback RecalculateBudgetSummary { get; set; }
 
-
     RadzenDataGrid<Models.Budget>? grid;
+    Models.Budget? editable;
+    List<string> categories = [];
     string FirstColumnHeader => Type switch
     {
-        BudgetType.Income => "Income",
-        BudgetType.Expenses => "Expenses",
-        BudgetType.Savings => "Savings",
-        _ => string.Empty
+        BudgetType.Summary => string.Empty,
+        _ => Type.ToString()
     };
-    Models.Budget? editable;
 
-    
-
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        Categories.RemoveAll(p => Data.Exists(d => d.Category == p));
-        base.OnInitialized();
+        if (Type is not BudgetType.Summary)
+        {
+            var getterResult = await GetCategoryDescriptionHandler.DoAsync(new(Type));
+            if (getterResult.IsFailure)
+            {
+                Logger.LogError("Failed to get category descriptions for budget type {Type}: {Error}", Type, getterResult.Error);
+                return;
+            }
+            categories = getterResult.Value; 
+        }
+        categories.RemoveAll(p => Data.Exists(d => d.Category == p));
+        await base.OnInitializedAsync();
     }
 
     async Task OnAddRowAsync()
@@ -61,7 +66,7 @@ public partial class BudgetGrid
         await grid.UpdateRow(budget);
     }
 
-    async Task OnCancelEditAsync(Models.    Budget budget)
+    async Task OnCancelEditAsync(Models.Budget budget)
     {
         if (grid == null)
             return;

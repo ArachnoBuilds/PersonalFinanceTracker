@@ -1,4 +1,5 @@
 using Application.Features.BudgetPlanning.GetBudget;
+using Application.Features.BudgetPlanning.GetCategoryDescription;
 using Application.Shared.Persistence;
 using Components;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,7 @@ builder.Services.AddScoped<ThemeService>();
 builder.Services.AddDbContext<ApplicationDbContext>(
     options => options.UseSqlite(builder.Configuration.GetConnectionString("TrackerDb")));
 builder.Services.AddScoped<GetBudgetHandler>();
+builder.Services.AddScoped<GetCategoryDescriptionHandler>();
 
 var app = builder.Build();
 
