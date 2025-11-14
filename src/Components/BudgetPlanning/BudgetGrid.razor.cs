@@ -2,6 +2,7 @@
 using Application.Shared.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
+using Radzen;
 using Radzen.Blazor;
 
 namespace Components.BudgetPlanning;
@@ -92,12 +93,13 @@ public partial class BudgetGrid
         if (result.IsFailure)
         {
             Logger.LogError("Failed to create budget: {Error}", result.Error);
-            Notifier.Notify(Radzen.NotificationSeverity.Error, NotificationMessages.BudgetCreationFailed);
+            Notifier.Notify(NotificationSeverity.Error, NotificationMessages.BudgetCreationFailed);
             return;
         }
         Data.Add(budget);
         Models.Budget.RecalculateTotal(Data);
         await RecalculateBudgetSummary.InvokeAsync();
+        Notifier.Notify(NotificationSeverity.Success, NotificationMessages.BudgetCreationSuccess);
     }
 
     async Task OnUpdateAsync(Models.Budget budget)
