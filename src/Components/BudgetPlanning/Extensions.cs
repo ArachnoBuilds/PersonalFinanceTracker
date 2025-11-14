@@ -55,7 +55,7 @@ internal static class Extensions
             return returnables;
         }
     }
-    extension(Models.Budget)
+    extension(Models.Budget budget)
     {
         public static Models.Budget ToSummaryBudget(
             Models.Budget income,
@@ -102,5 +102,23 @@ internal static class Extensions
             totalBudget.Nov = otherBudgets.Sum(b => b.Nov);
             totalBudget.Dec = otherBudgets.Sum(b => b.Dec);
         }
+
+        public AnnualBudget ToAnnualBudget() =>
+            new(budget.Category,
+                new()
+                {
+                    [Month.Jan] = budget.Jan,
+                    [Month.Feb] = budget.Feb,
+                    [Month.Mar] = budget.Mar,
+                    [Month.Apr] = budget.Apr,
+                    [Month.May] = budget.May,
+                    [Month.Jun] = budget.Jun,
+                    [Month.Jul] = budget.Jul,
+                    [Month.Aug] = budget.Aug,
+                    [Month.Sep] = budget.Sep,
+                    [Month.Oct] = budget.Oct,
+                    [Month.Nov] = budget.Nov,
+                    [Month.Dec] = budget.Dec
+                });
     }
 }

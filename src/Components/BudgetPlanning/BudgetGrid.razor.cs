@@ -81,6 +81,8 @@ public partial class BudgetGrid
 
     async Task OnCreateAsync(Models.Budget budget)
     {
+        var annualBudget = budget.ToAnnualBudget();
+
         Data.Add(budget);
         Models.Budget.RecalculateTotal(Data);
         await RecalculateBudgetSummary.InvokeAsync();
