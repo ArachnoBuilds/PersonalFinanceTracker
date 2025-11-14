@@ -37,10 +37,11 @@
 				</Template>
 				<EditTemplate Context="data">
 					<RadzenAutoComplete Name="Category" 
-										@bind-Value=@data.CategoryDesc 
-										Data=@categories 
+										Data="@categories" 
+										TextProperty="Description"
 										FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
 										FilterOperator="StringFilterOperator.Contains"
+										ValueChanged="(categoryDesc) => OnCategoryChanged(categoryDesc, data)"
 										Style="width: 100%" />
 					<RadzenRequiredValidator Component="Category" Text="@($"{FirstColumnHeader} category is required")" Popup="true" Style="position: absolute" />
 					<RadzenRegexValidator Component="Category" Text="@($"{FirstColumnHeader} category shouldn't conatin any special characters")" Pattern="[a-zA-Z\d ]*" Popup=@true Style="position: absolute" />
@@ -273,4 +274,18 @@
 			@text
 		}
 	};
+	void OnCategoryChanged(string categoryDesc, Models.Budget data)
+	{
+		var selectedCategory = categories.Find(p => p.Description == categoryDesc);
+		if (selectedCategory == null)
+		{
+			data.CategoryId = -1;
+			data.CategoryDesc = categoryDesc;
+		}
+		else
+		{
+			data.CategoryId = selectedCategory.Id;
+			data.CategoryDesc = selectedCategory.Description;
+		}
+	}
 }
