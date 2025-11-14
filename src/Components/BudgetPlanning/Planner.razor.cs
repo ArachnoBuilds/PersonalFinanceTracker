@@ -37,8 +37,9 @@ public partial class Planner
                 .FindAll(p => p.Result.IsFailure)
                 .ForEach(p =>
                 {
-                    if (!Logger.IsEnabled(LogLevel.Error))
-                        return;
+                    // TODO check why Logger.IsEnabled is not behaving as expectation
+                    //if (!Logger.IsEnabled(LogLevel.Error))
+                    //    return;
                     Logger.LogError("Error fetching budgets for year {Year}: {Error}",
                         selectedYear,
                         p.Result.Error);
