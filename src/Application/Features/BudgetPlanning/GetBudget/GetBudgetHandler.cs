@@ -11,6 +11,9 @@ public class GetBudgetHandler(ApplicationDbContext context)
 {
     public async Task<Result<List<AnnualBudget>>> DoAsync(GetBudgetQuery query, CancellationToken cancellation = default)
     {
+        if (query.Type is BudgetType.Summary)
+            return Errors.BudgetTypeSummaryNotAllowed;
+
         var (year, type) = (query.Year, query.Type.ToString());
         List<AnnualBudget> annualBudgets = [];
         try
