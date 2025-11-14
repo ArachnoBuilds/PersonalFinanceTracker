@@ -8,16 +8,18 @@ internal static class Extensions
     {
         public List<Models.Budget> ToBudget()
         {
-            Models.Budget total = new(-1)
+            Models.Budget total = new()
             {
+                CategoryId = -1,
                 CategoryDesc = "Total"
             };
             List<Models.Budget> returnables = [];
             foreach (var p in budgets)
             {
                 // convert AnnualBudget to Budget
-                Models.Budget budget = new(p.CategoryId)
+                Models.Budget budget = new()
                 {
+                    CategoryId = p.CategoryId,
                     CategoryDesc = p.CategoryDesc,
                     Jan = p.Budgets.GetValueOrDefault(Month.Jan, 0),
                     Feb = p.Budgets.GetValueOrDefault(Month.Feb, 0),
@@ -64,8 +66,9 @@ internal static class Extensions
         {
             if (!income.IsTotalCategory || !expense.IsTotalCategory || !saving.IsTotalCategory)
                 throw new ArgumentException("All budgets must be total categories.");
-            Models.Budget summary = new(-1)
+            Models.Budget summary = new()
             {
+                CategoryId = -1,
                 Jan = income.Jan - expense.Jan - saving.Jan,
                 Feb = income.Feb - expense.Feb - saving.Feb,
                 Mar = income.Mar - expense.Mar - saving.Mar,
