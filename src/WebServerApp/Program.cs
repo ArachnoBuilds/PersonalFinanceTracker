@@ -1,22 +1,25 @@
+using Application.Features.BudgetPlanning.GetBudget;
+using Application.Shared.Persistence;
 using Components;
+using Microsoft.EntityFrameworkCore;
 using Radzen;
-using Services;
 using WebServerApp;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddRazorComponents()
+builder.Services
+    .AddRazorComponents()
     .AddInteractiveServerComponents();
 
-
+// Radzen Services
 builder.Services.AddRadzenComponents();
-
-//builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
-
 builder.Services.AddScoped<DialogService>();
 builder.Services.AddScoped<ThemeService>();
-builder.Services.AddScoped<BudgetService>();
+
+builder.Services.AddDbContext<ApplicationDbContext>(
+    options => options.UseSqlite(builder.Configuration.GetConnectionString("TrackerDb")));
+builder.Services.AddScoped<GetBudgetHandler>();
 
 var app = builder.Build();
 
