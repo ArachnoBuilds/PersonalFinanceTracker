@@ -1,4 +1,5 @@
-﻿using Application.Shared.Models;
+﻿using Application.Features.BudgetPlanning.Models;
+using Application.Shared.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 using Radzen.Blazor;
@@ -18,7 +19,7 @@ public partial class BudgetGrid
 
     RadzenDataGrid<Models.Budget>? grid;
     Models.Budget? editable;
-    List<string> categories = [];
+    List<Category> categories = [];
     string FirstColumnHeader => Type switch
     {
         BudgetType.Summary => string.Empty,
@@ -37,7 +38,7 @@ public partial class BudgetGrid
             }
             categories = getterResult.Value; 
         }
-        categories.RemoveAll(p => Data.Exists(d => d.CategoryDesc == p));
+        categories.RemoveAll(p => Data.Exists(d => d.CategoryDesc == p.Description));
         await base.OnInitializedAsync();
     }
 
