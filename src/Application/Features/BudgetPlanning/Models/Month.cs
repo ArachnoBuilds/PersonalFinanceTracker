@@ -1,4 +1,4 @@
-﻿namespace Application.Features.BudgetPlanning.GetBudget.Models;
+﻿namespace Application.Features.BudgetPlanning.Models;
 
 public enum Month
 {

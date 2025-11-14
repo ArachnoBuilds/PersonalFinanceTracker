@@ -1,4 +1,4 @@
-﻿namespace Application.Features.BudgetPlanning.GetBudget.Models;
+﻿namespace Application.Features.BudgetPlanning.Models;
 
 public record AnnualBudget(string Category, Dictionary<Month, decimal> Budgets);
 

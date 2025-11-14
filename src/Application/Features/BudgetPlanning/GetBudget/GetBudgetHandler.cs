@@ -1,4 +1,4 @@
-﻿using Application.Features.BudgetPlanning.GetBudget.Models;
+﻿using Application.Features.BudgetPlanning.Models;
 using Application.Shared;
 using Application.Shared.Models;
 using Application.Shared.Persistence;
