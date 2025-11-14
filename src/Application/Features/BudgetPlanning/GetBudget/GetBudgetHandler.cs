@@ -5,7 +5,7 @@ using Application.Shared.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Features.BudgetPlanning.GetBudget;
-using CategoryBasedBudget = (string Category, IEnumerable<Budget> Budgets);
+using CategoryBasedBudget = (int CategoryId, string CategoryDesc, IEnumerable<Budget> Budgets);
 
 public class GetBudgetHandler(ApplicationDbContext context)
 {
@@ -23,6 +23,7 @@ public class GetBudgetHandler(ApplicationDbContext context)
                         .AsNoTracking()
                         .Where(p => p.Type == type && p.Budgets.Any(b => b.Year == year))
                         .Select(p => new CategoryBasedBudget(
+                            p.Id,
                             p.Description,
                             p.Budgets.Where(b => b.Year == year)))
                         .ToListAsync(cancellation)
@@ -32,6 +33,7 @@ public class GetBudgetHandler(ApplicationDbContext context)
             annualBudgets = [
                 .. budgets
                 .Select(b => new AnnualBudget(
+                    b.CategoryId,
                     b.CategoryDesc,
                     b.Budgets.ToDictionary(
                         k => (Month)k.Month,
