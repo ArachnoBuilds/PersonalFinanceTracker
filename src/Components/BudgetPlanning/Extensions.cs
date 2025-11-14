@@ -18,7 +18,7 @@ internal static class Extensions
                 // convert AnnualBudget to Budget
                 Models.Budget budget = new()
                 {
-                    Category = p.Category,
+                    Category = p.CategoryDesc,
                     Jan = p.Budgets.GetValueOrDefault(Month.Jan, 0),
                     Feb = p.Budgets.GetValueOrDefault(Month.Feb, 0),
                     Mar = p.Budgets.GetValueOrDefault(Month.Mar, 0),

@@ -32,7 +32,7 @@ public class GetBudgetHandler(ApplicationDbContext context)
             annualBudgets = [
                 .. budgets
                 .Select(b => new AnnualBudget(
-                    b.Category,
+                    b.CategoryDesc,
                     b.Budgets.ToDictionary(
                         k => (Month)k.Month,
                         v => (decimal)v.Amount)))
