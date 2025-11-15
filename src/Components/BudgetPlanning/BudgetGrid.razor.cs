@@ -41,7 +41,7 @@ public partial class BudgetGrid
                 Logger.LogError("Failed to get category descriptions for budget type {Type}: {Error}", Type, getterResult.Error);
                 return;
             }
-            categories = getterResult.Value; 
+            categories = getterResult.Value;
         }
         // TODO check later if this is needed
         //categories.RemoveAll(p => Data.Exists(d => d.CategoryDesc == p.Description));
@@ -58,6 +58,7 @@ public partial class BudgetGrid
         }
 
         operation = Operation.Create;
+        selectedCategoryDesc = string.Empty;
         await grid.InsertRow(new()
         {
             CategoryId = -1
@@ -66,19 +67,68 @@ public partial class BudgetGrid
 
     async Task OnEditRowAsync(Models.Budget budget)
     {
-        if (grid == null || !grid.IsValid)
+        // TODO notification should be more specific
+        if (grid == null || !grid.IsValid || operation is not Operation.None)
+        {
+            Notifier.Notify(NotificationSeverity.Error, NotificationMessages.BudgetUpdationFailed);
             return;
+        }
 
-        editable = budget;
+        operation = Operation.Update;
+        selectedCategoryDesc = budget.CategoryDesc;
         await grid.EditRow(budget);
     }
 
     async Task OnSaveRowAsync(Models.Budget budget)
     {
+        // TODO add notification 
         if (grid == null || !grid.IsValid)
             return;
 
+        // validate for both create and update operations
+        if (Data.Exists(p => p.CategoryDesc == selectedCategoryDesc))
+        {
+            Notifier.Notify(NotificationSeverity.Error, NotificationMessages.BudgetCategoryAlreadyExists);
+            return;
+        }
+
+        // set category details based on operation
+        switch (operation)
+        {
+            case Operation.Create:
+                {
+                    var selectedCategory = categories.Find(p => p.Description == selectedCategoryDesc);
+                    if (selectedCategory == null)
+                    {
+                        budget.CategoryId = -1;
+                        budget.CategoryDesc = selectedCategoryDesc;
+                    }
+                    else
+                    {
+                        budget.CategoryId = selectedCategory.Id;
+                        budget.CategoryDesc = selectedCategory.Description;
+                    }
+                    break;
+                }
+            case Operation.Update:
+                {
+                    budget.CategoryDesc = selectedCategoryDesc;
+                    break;
+                }
+            default:
+                {
+                    if (Logger.IsEnabled(LogLevel.Error))
+                        Logger.LogError("Invalid operation {Operation} in OnSaveRowAsync", operation);
+                    return;
+                }
+        }
+
+        // save changes
         await grid.UpdateRow(budget);
+
+        // reset
+        selectedCategoryDesc = string.Empty;
+        operation = Operation.None;
     }
 
     async Task OnCancelEditAsync(Models.Budget budget)
@@ -105,18 +155,15 @@ public partial class BudgetGrid
         {
             Logger.LogError("Failed to create budget: {Error}", result.Error);
             Notifier.Notify(NotificationSeverity.Error, NotificationMessages.BudgetCreationFailed);
-            return;
         }
         else
         {
-        Data.Add(budget);
-        Models.Budget.RecalculateTotal(Data);
-        await RecalculateBudgetSummary.InvokeAsync();
-        Notifier.Notify(NotificationSeverity.Success, NotificationMessages.BudgetCreationSuccess);
-    }
+            Data.Add(budget);
+            Models.Budget.RecalculateTotal(Data);
+            await RecalculateBudgetSummary.InvokeAsync();
+            Notifier.Notify(NotificationSeverity.Success, NotificationMessages.BudgetCreationSuccess);
+        }
 
-        selectedCategoryDesc = string.Empty;
-        operation = Operation.None;
     }
 
     async Task OnUpdateAsync(Models.Budget budget)

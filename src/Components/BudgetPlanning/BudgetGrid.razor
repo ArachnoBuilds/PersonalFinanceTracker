@@ -38,14 +38,24 @@
 					</RadzenText>
 				</Template>
 				<EditTemplate Context="data">
-					<RadzenAutoComplete Name="Category" 
-										Data="@categories" 
-										TextProperty="Description"
-										Value="@selectedCategoryDesc"
-										FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
-										FilterOperator="StringFilterOperator.Contains"
-										ValueChanged="(args) => OnCategoryChanged(args, data)"
-										Style="width: 100%" />
+					@switch (operation)
+					{
+						case Operation.Create:
+							<RadzenAutoComplete Name="Category"
+												Data="@categories"
+												TextProperty="Description"
+												@bind-Value="@selectedCategoryDesc"
+												FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+												FilterOperator="StringFilterOperator.Contains"
+												Style="width: 100%" />
+							break;
+						case Operation.Update:
+							<RadzenTextBox Name="Category"
+										   @bind-Value="@selectedCategoryDesc"
+										   Style="width:100%" />
+							break;
+					}
+
 					<RadzenRequiredValidator Component="Category" Text="@($"{FirstColumnHeader} category is required")" Popup="true" Style="position: absolute" />
 					<RadzenRegexValidator Component="Category" Text="@($"{FirstColumnHeader} category shouldn't conatin any special characters")" Pattern="[a-zA-Z\d ]*" Popup=@true Style="position: absolute" />
 				</EditTemplate>
@@ -277,27 +287,4 @@
 			@text
 		}
 	};
-	void OnCategoryChanged(string categoryDesc, Models.Budget data)
-	{
-		// validate
-		if (operation is Operation.Create && Data.Exists(p => p.CategoryDesc == categoryDesc))
-		{
-			Notifier.Notify(NotificationSeverity.Error, NotificationMessages.BudgetCategoryAlreadyExists);
-			selectedCategoryDesc = string.Empty;
-			return;
-		}
-
-		selectedCategoryDesc = categoryDesc;
-		var selectedCategory = categories.Find(p => p.Description == selectedCategoryDesc);
-		if (selectedCategory == null)
-		{
-			data.CategoryId = -1;
-			data.CategoryDesc = selectedCategoryDesc;
-		}
-		else
-		{
-			data.CategoryId = selectedCategory.Id;
-			data.CategoryDesc = selectedCategory.Description;
-		}
-	}
 }
