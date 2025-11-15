@@ -28,6 +28,8 @@ public partial class BudgetGrid
         BudgetType.Summary => string.Empty,
         _ => Type.ToString()
     };
+    Operation operation = Operation.None;
+    string selectedCategoryDesc = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -41,15 +43,21 @@ public partial class BudgetGrid
             }
             categories = getterResult.Value; 
         }
-        categories.RemoveAll(p => Data.Exists(d => d.CategoryDesc == p.Description));
+        // TODO check later if this is needed
+        //categories.RemoveAll(p => Data.Exists(d => d.CategoryDesc == p.Description));
         await base.OnInitializedAsync();
     }
 
     async Task OnAddRowAsync()
     {
-        if (grid == null || !grid.IsValid)
+        // TODO notification should be more specific
+        if (grid == null || !grid.IsValid || operation is not Operation.None)
+        {
+            Notifier.Notify(NotificationSeverity.Error, NotificationMessages.BudgetCreationFailed);
             return;
+        }
 
+        operation = Operation.Create;
         await grid.InsertRow(new()
         {
             CategoryId = -1
@@ -88,6 +96,9 @@ public partial class BudgetGrid
 
     async Task OnCreateAsync(Models.Budget budget)
     {
+        if (operation is not Operation.Create)
+            return;
+
         var annualBudget = budget.ToAnnualBudget();
         var result = await CreateBudgetHandler.DoAsync(new(Year, Type, annualBudget)).ConfigureAwait(false);
         if (result.IsFailure)
@@ -96,10 +107,16 @@ public partial class BudgetGrid
             Notifier.Notify(NotificationSeverity.Error, NotificationMessages.BudgetCreationFailed);
             return;
         }
+        else
+        {
         Data.Add(budget);
         Models.Budget.RecalculateTotal(Data);
         await RecalculateBudgetSummary.InvokeAsync();
         Notifier.Notify(NotificationSeverity.Success, NotificationMessages.BudgetCreationSuccess);
+    }
+
+        selectedCategoryDesc = string.Empty;
+        operation = Operation.None;
     }
 
     async Task OnUpdateAsync(Models.Budget budget)
@@ -125,5 +142,10 @@ public partial class BudgetGrid
         await RecalculateBudgetSummary.InvokeAsync();
 
         await grid.Reload();
+    }
+
+    enum Operation
+    {
+        Create, Update, Delete, None
     }
 }
