@@ -85,18 +85,19 @@ public partial class BudgetGrid
         if (grid == null || !grid.IsValid)
             return;
 
-        // validate for both create and update operations
-        if (Data.Exists(p => p.CategoryDesc == selectedCategoryDesc))
-        {
-            Notifier.Notify(NotificationSeverity.Error, NotificationMessages.BudgetCategoryAlreadyExists);
-            return;
-        }
-
         // set category details based on operation
         switch (operation)
         {
             case Operation.Create:
                 {
+                    // validate
+                    if (Data.Exists(p => p.CategoryDesc == selectedCategoryDesc))
+                    {
+                        Notifier.Notify(NotificationSeverity.Error, NotificationMessages.BudgetCategoryAlreadyExists);
+                        return;
+                    }
+
+                    // update
                     var selectedCategory = categories.Find(p => p.Description == selectedCategoryDesc);
                     if (selectedCategory == null)
                     {
@@ -112,6 +113,14 @@ public partial class BudgetGrid
                 }
             case Operation.Update:
                 {
+                    // validate
+                    if (Data.Exists(p => p.CategoryId != budget.CategoryId && p.CategoryDesc == selectedCategoryDesc))
+                    {
+                        Notifier.Notify(NotificationSeverity.Error, NotificationMessages.BudgetCategoryAlreadyExists);
+                        return;
+                    }
+
+                    // update
                     budget.CategoryDesc = selectedCategoryDesc;
                     break;
                 }
@@ -168,15 +177,25 @@ public partial class BudgetGrid
 
     async Task OnUpdateAsync(Models.Budget budget)
     {
-        if (editable == null)
+        if (operation is not Operation.Update)
             return;
 
-        var idx = Data.IndexOf(editable);
-        Data.Remove(editable);
-        Data.Insert(idx, budget);
-        Models.Budget.RecalculateTotal(Data);
-        editable = null;
-        await RecalculateBudgetSummary.InvokeAsync();
+        var annualBudget = budget.ToAnnualBudget();
+        var result = await UpdateBudgetHandler.DoAsync(new(Year, annualBudget)).ConfigureAwait(false);
+        if (result.IsFailure)
+        {
+            Logger.LogError("Failed to update budget: {Error}", result.Error);
+            Notifier.Notify(NotificationSeverity.Error, NotificationMessages.BudgetUpdationFailed);
+            return;
+        }
+        else
+        {
+            Data.RemoveAll(p => p.CategoryId == budget.CategoryId);
+            Data.Add(budget);
+            Models.Budget.RecalculateTotal(Data);
+            await RecalculateBudgetSummary.InvokeAsync();
+            Notifier.Notify(NotificationSeverity.Success, NotificationMessages.BudgetUpdationSuccess);
+        }
     }
 
     async Task OnDeleteAsync(Models.Budget budget)

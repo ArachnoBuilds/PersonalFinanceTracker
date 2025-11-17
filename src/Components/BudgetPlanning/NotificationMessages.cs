@@ -7,4 +7,5 @@ internal static class NotificationMessages
     public const string BudgetFetchFailed = "Failed to fetch budget data.";
     public const string BudgetUpdationFailed = "Failed to update budget entry.";
     public const string BudgetCategoryAlreadyExists = "Budget category already exists.";
+    public const string BudgetUpdationSuccess = "Budget entry updated successfully.";
 }

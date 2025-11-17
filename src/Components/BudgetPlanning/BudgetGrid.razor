@@ -1,9 +1,11 @@
 ﻿@using Application.Features.BudgetPlanning.CreateBudget
 @using Application.Features.BudgetPlanning.GetCategoryDescription
+@using Application.Features.BudgetPlanning.UpdateBudget
 @using Application.Shared.Models
 @using Microsoft.Extensions.Logging
 @inject GetCategoryDescriptionHandler GetCategoryDescriptionHandler
 @inject CreateBudgetHandler CreateBudgetHandler
+@inject UpdateBudgetHandler UpdateBudgetHandler
 @inject ILogger<BudgetGrid> Logger
 
 <RadzenDataGrid @ref="@grid"
