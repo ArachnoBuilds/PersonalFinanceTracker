@@ -5,8 +5,9 @@ namespace Application.Features.BudgetPlanning.CreateBudget;
 
 public class CreateBudgetHandler(ApplicationDbContext context)
 {
-    public async Task<Result> DoAsync(CreateBudgetCommand command)
+    public async Task<Result<int>> DoAsync(CreateBudgetCommand command)
     {
+        int categoryId = -1;
         try
         {
             if (command.Budget.CategoryId == -1)
@@ -15,7 +16,8 @@ public class CreateBudgetHandler(ApplicationDbContext context)
                 var count = context.Categories.Count();
 
                 // create new category and budgets
-                var category = command.Budget.ToCategory(command.Type, count + 1);
+                categoryId = count + 1;
+                var category = command.Budget.ToCategory(command.Type, categoryId);
                 var budgets = command.Budget.ToBudgets(command.Year, category.Id);
 
                 // add to context
@@ -24,6 +26,8 @@ public class CreateBudgetHandler(ApplicationDbContext context)
             }
             else
             {
+                categoryId = command.Budget.CategoryId;
+
                 // create budgets only
                 var budgets = command.Budget.ToBudgets(command.Year);
                 context.Budgets.AddRange(budgets);
@@ -32,8 +36,8 @@ public class CreateBudgetHandler(ApplicationDbContext context)
         }
         catch (Exception exc)
         {
-            return Result.Failure(exc);
+            return Result.Failure<int>(exc);
         }
-        return Result.Success();
+        return Result.Success(categoryId);
     }
 }
