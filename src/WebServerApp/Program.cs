@@ -1,4 +1,5 @@
 using Application.Features.BudgetPlanning.CreateBudget;
+using Application.Features.BudgetPlanning.DeleteBudget;
 using Application.Features.BudgetPlanning.GetBudget;
 using Application.Features.BudgetPlanning.GetCategoryDescription;
 using Application.Features.BudgetPlanning.UpdateBudget;
@@ -27,6 +28,7 @@ builder.Services.AddScoped<GetBudgetHandler>();
 builder.Services.AddScoped<GetCategoryDescriptionHandler>();
 builder.Services.AddScoped<CreateBudgetHandler>();
 builder.Services.AddScoped<UpdateBudgetHandler>();
+builder.Services.AddScoped<DeleteBudgetHandler>();
 
 var app = builder.Build();
 

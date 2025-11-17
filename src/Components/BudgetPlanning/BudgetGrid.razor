@@ -1,4 +1,5 @@
 ﻿@using Application.Features.BudgetPlanning.CreateBudget
+@using Application.Features.BudgetPlanning.DeleteBudget
 @using Application.Features.BudgetPlanning.GetCategoryDescription
 @using Application.Features.BudgetPlanning.UpdateBudget
 @using Application.Shared.Models
@@ -6,6 +7,7 @@
 @inject GetCategoryDescriptionHandler GetCategoryDescriptionHandler
 @inject CreateBudgetHandler CreateBudgetHandler
 @inject UpdateBudgetHandler UpdateBudgetHandler
+@inject DeleteBudgetHandler DeleteBudgetHandler
 @inject ILogger<BudgetGrid> Logger
 
 <RadzenDataGrid @ref="@grid"
@@ -252,7 +254,7 @@
 				</HeaderTemplate>
 				<Template Context="data">
 					<RadzenIcon Icon="edit" @onclick="async (args) => await OnEditRowAsync(data)" Style="cursor:pointer" />
-					<RadzenIcon Icon="delete" IconStyle="IconStyle.Danger" @onclick="async (args) => await OnDeleteAsync(data)" Style="cursor:pointer" />
+					<RadzenIcon Icon="delete" IconStyle="IconStyle.Danger" @onclick="async () => await OnDeleteAsync(data)" Style="cursor:pointer" />
 				</Template>
 				<EditTemplate Context="data">
 					<RadzenIcon Icon="check_circle" IconStyle="IconStyle.Success" @onclick="async (args) => await OnSaveRowAsync(data)" Style="cursor:pointer" />

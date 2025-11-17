@@ -167,6 +167,8 @@ public partial class BudgetGrid
         }
         else
         {
+            if (budget.CategoryId == -1)
+                budget.CategoryId = result.Value;
             Data.Add(budget);
             Models.Budget.RecalculateTotal(Data);
             await RecalculateBudgetSummary.InvokeAsync();
@@ -203,9 +205,29 @@ public partial class BudgetGrid
         if (grid == null)
             return;
 
-        Data.Remove(budget);
-        Models.Budget.RecalculateTotal(Data);
-        await RecalculateBudgetSummary.InvokeAsync();
+        var confirm = await DlgSvc.Confirm(
+            "Are you sure?",
+            $"Delete budget for {budget.CategoryDesc}",
+            new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" })
+            .ConfigureAwait(false);
+        if (confirm.HasValue && !confirm.Value)
+            return;
+
+        var result = await DeleteBudgetHandler.DoAsync(new(Year, budget.CategoryId)).ConfigureAwait(false);
+        if (result.IsFailure)
+        {
+            Logger.LogError("Failed to delete budget: {Error}", result.Error);
+            Notifier.Notify(NotificationSeverity.Error, NotificationMessages.BudgetDeletionFailed);
+            return;
+        }
+        else
+        {
+            Data.Remove(budget);
+            Models.Budget.RecalculateTotal(Data);
+            // TODO needed to be fixed
+            await RecalculateBudgetSummary.InvokeAsync().ConfigureAwait(false);
+            Notifier.Notify(NotificationSeverity.Success, NotificationMessages.BudgetDeletionSuccess);
+        }
 
         await grid.Reload();
     }
