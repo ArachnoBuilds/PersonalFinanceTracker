@@ -7,9 +7,11 @@
 @inject GetBudgetHandler GetBudgetHandler
 @inject ILogger<Planner> Logger
 
-<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Normal" Wrap="FlexWrap.Wrap">
-	<BudgetGrid Data="@summaries"
-				Type="BudgetType.Summary" />
+<RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Normal" Wrap="FlexWrap.Wrap">
+	<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End">
+		<BudgetGrid Data="@summaries"
+					Type="BudgetType.Summary" />
+	</RadzenStack>
 	<BudgetGrid @bind-Data="@incomes"
 				Type="BudgetType.Income"
 				RecalculateBudgetSummary="@RecalculateSummary" />

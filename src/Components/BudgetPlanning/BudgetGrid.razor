@@ -17,11 +17,12 @@
 				AllowColumnResize="true"
 				AllowAlternatingRows="true"
 				EditMode="DataGridEditMode.Single"
+				Density="Density.Compact"
 				RowCreate="@OnCreateAsync"
 				RowUpdate="@OnUpdateAsync"
 				TItem="Models.Budget"
 				Data="@Data"
-				Style="@($"overflow:scroll{(Type is not BudgetType.Summary ? "; max-height: 23vh" : string.Empty)}")">
+				Style="@($"overflow:scroll{(Type is not BudgetType.Summary ? "; max-height: 24vh" : "; width: 75vw")}")">
 	<Columns>
 		@if (Type != BudgetType.Summary)
 		{
@@ -62,8 +63,8 @@
 							break;
 					}
 
-					<RadzenRequiredValidator Component="Category" Text="@($"{FirstColumnHeader} category is required")" Popup="true" Style="position: absolute" />
-					<RadzenRegexValidator Component="Category" Text="@($"{FirstColumnHeader} category shouldn't conatin any special characters")" Pattern="[a-zA-Z\d ]*" Popup=@true Style="position: absolute" />
+					<RadzenRequiredValidator Component="Category" Text="@($"{FirstColumnHeader} category is required")" Popup="false" Style="display: block" />
+					<RadzenRegexValidator Component="Category" Text="@($"{FirstColumnHeader} category shouldn't conatin any special characters")" Pattern="[a-zA-Z\d ]*" Popup="false" Style="display: block" />
 				</EditTemplate>
 			</RadzenDataGridColumn>
 		}
@@ -77,7 +78,7 @@
 				@Render(data.Jan, data.IsTotalCategory)
 			</Template>
 			<EditTemplate Context="data">
-				<RadzenNumeric Name="Jan" @bind-Value="@data.Jan" Min="0" Format="#.00" Style="width:100%" />
+				<RadzenNumeric Name="Jan" @bind-Value="@data.Jan" Min="0" ShowUpDown="false" Style="width:100%" />
 				<RadzenNumericRangeValidator Component="Jan" Min="0.00m" Text="Amount can't be less than zero" Popup="true" Style="position: absolute" />
 			</EditTemplate>
 		</RadzenDataGridColumn>
@@ -91,7 +92,7 @@
 				@Render(data.Feb, data.IsTotalCategory)
 			</Template>
 			<EditTemplate Context="data">
-				<RadzenNumeric Name="Feb" @bind-Value="@data.Feb" Min="0" Format="#.00" Style="width:100%" />
+				<RadzenNumeric Name="Feb" @bind-Value="@data.Feb" Min="0" ShowUpDown="false" Style="width:100%" />
 				<RadzenNumericRangeValidator Component="Feb" Min="0.00m" Text="Amount can't be less than zero" Popup="true" Style="position: absolute" />
 			</EditTemplate>
 		</RadzenDataGridColumn>
@@ -105,7 +106,7 @@
 				@Render(data.Mar, data.IsTotalCategory)
 			</Template>
 			<EditTemplate Context="data">
-				<RadzenNumeric Name="Mar" @bind-Value="@data.Mar" Min="0" Format="#.00" Style="width:100%" />
+				<RadzenNumeric Name="Mar" @bind-Value="@data.Mar" Min="0" ShowUpDown="false" Style="width:100%" />
 				<RadzenNumericRangeValidator Component="Mar" Min="0.00m" Text="Amount can't be less than zero" Popup="true" Style="position: absolute" />
 			</EditTemplate>
 		</RadzenDataGridColumn>
@@ -119,7 +120,7 @@
 				@Render(data.Apr, data.IsTotalCategory)
 			</Template>
 			<EditTemplate Context="data">
-				<RadzenNumeric Name="Apr" @bind-Value="@data.Apr" Min="0" Format="#.00" Style="width:100%" />
+				<RadzenNumeric Name="Apr" @bind-Value="@data.Apr" Min="0" ShowUpDown="false" Style="width:100%" />
 				<RadzenNumericRangeValidator Component="Apr" Min="0.00m" Text="Amount can't be less than zero" Popup="true" Style="position: absolute" />
 			</EditTemplate>
 		</RadzenDataGridColumn>
@@ -133,7 +134,7 @@
 				@Render(data.May, data.IsTotalCategory)
 			</Template>
 			<EditTemplate Context="data">
-				<RadzenNumeric Name="May" @bind-Value="@data.May" Min="0" Format="#.00" Style="width:100%" />
+				<RadzenNumeric Name="May" @bind-Value="@data.May" Min="0" ShowUpDown="false" Style="width:100%" />
 				<RadzenNumericRangeValidator Component="May" Min="0.00m" Text="Amount can't be less than zero" Popup="true" Style="position: absolute" />
 			</EditTemplate>
 		</RadzenDataGridColumn>
@@ -147,7 +148,7 @@
 				@Render(data.Jun, data.IsTotalCategory)
 			</Template>
 			<EditTemplate Context="data">
-				<RadzenNumeric Name="Jun" @bind-Value="@data.Jun" Min="0" Format="#.00" Style="width:100%" />
+				<RadzenNumeric Name="Jun" @bind-Value="@data.Jun" Min="0" ShowUpDown="false" Style="width:100%" />
 				<RadzenNumericRangeValidator Component="Jun" Min="0.00m" Text="Amount can't be less than zero" Popup="true" Style="position: absolute" />
 			</EditTemplate>
 		</RadzenDataGridColumn>
@@ -161,7 +162,7 @@
 				@Render(data.Jul, data.IsTotalCategory)
 			</Template>
 			<EditTemplate Context="data">
-				<RadzenNumeric Name="Jul" @bind-Value="@data.Jul" Min="0" Format="#.00" Style="width:100%" />
+				<RadzenNumeric Name="Jul" @bind-Value="@data.Jul" Min="0" ShowUpDown="false" Style="width:100%" />
 				<RadzenNumericRangeValidator Component="Jul" Min="0.00m" Text="Amount can't be less than zero" Popup="true" Style="position: absolute" />
 			</EditTemplate>
 		</RadzenDataGridColumn>
@@ -175,7 +176,7 @@
 				@Render(data.Aug, data.IsTotalCategory)
 			</Template>
 			<EditTemplate Context="data">
-				<RadzenNumeric Name="Aug" @bind-Value="@data.Aug" Min="0" Format="#.00" Style="width:100%" />
+				<RadzenNumeric Name="Aug" @bind-Value="@data.Aug" Min="0" ShowUpDown="false" Style="width:100%" />
 				<RadzenNumericRangeValidator Component="Aug" Min="0.00m" Text="Amount can't be less than zero" Popup="true" Style="position: absolute" />
 			</EditTemplate>
 		</RadzenDataGridColumn>
@@ -189,7 +190,7 @@
 				@Render(data.Sep, data.IsTotalCategory)
 			</Template>
 			<EditTemplate Context="data">
-				<RadzenNumeric Name="Sep" @bind-Value="@data.Sep" Min="0" Format="#.00" Style="width:100%" />
+				<RadzenNumeric Name="Sep" @bind-Value="@data.Sep" Min="0" ShowUpDown="false" Style="width:100%" />
 				<RadzenNumericRangeValidator Component="Sep" Min="0.00m" Text="Amount can't be less than zero" Popup="true" Style="position: absolute" />
 			</EditTemplate>
 		</RadzenDataGridColumn>
@@ -203,7 +204,7 @@
 				@Render(data.Oct, data.IsTotalCategory)
 			</Template>
 			<EditTemplate Context="data">
-				<RadzenNumeric Name="Oct" @bind-Value="@data.Oct" Min="0" Format="#.00" Style="width:100%" />
+				<RadzenNumeric Name="Oct" @bind-Value="@data.Oct" Min="0" ShowUpDown="false" Style="width:100%" />
 				<RadzenNumericRangeValidator Component="Oct" Min="0.00m" Text="Amount can't be less than zero" Popup="true" Style="position: absolute" />
 			</EditTemplate>
 		</RadzenDataGridColumn>
@@ -217,7 +218,7 @@
 				@Render(data.Nov, data.IsTotalCategory)
 			</Template>
 			<EditTemplate Context="data">
-				<RadzenNumeric Name="Nov" @bind-Value="@data.Nov" Min="0" Format="#.00" Style="width:100%" />
+				<RadzenNumeric Name="Nov" @bind-Value="@data.Nov" Min="0" ShowUpDown="false" Style="width:100%" />
 				<RadzenNumericRangeValidator Component="Nov" Min="0.00m" Text="Amount can't be less than zero" Popup="true" Style="position: absolute" />
 			</EditTemplate>
 		</RadzenDataGridColumn>
@@ -231,7 +232,7 @@
 				@Render(data.Dec, data.IsTotalCategory)
 			</Template>
 			<EditTemplate Context="data">
-				<RadzenNumeric Name="Dec" @bind-Value="@data.Dec" Min="0" Format="#.00" Style="width:100%" />
+				<RadzenNumeric Name="Dec" @bind-Value="@data.Dec" Min="0" ShowUpDown="false" Style="width:100%" />
 				<RadzenNumericRangeValidator Component="Dec" Min="0.00m" Text="Amount can't be less than zero" Popup="true" Style="position: absolute" />
 			</EditTemplate>
 		</RadzenDataGridColumn>
@@ -242,7 +243,7 @@
 							  Sortable="false"
 							  TextAlign="TextAlign.Right">
 			<Template Context="data">
-				@Render(data.Total, data.IsTotalCategory)
+				@Render(data.Total, true)
 			</Template>
 		</RadzenDataGridColumn>
 		@if (Type != BudgetType.Summary)
@@ -255,12 +256,12 @@
 					<RadzenButton Icon="add_circle" Text="Add" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Small" Click="@OnAddRowAsync" />
 				</HeaderTemplate>
 				<Template Context="data">
-					<RadzenIcon Icon="edit" @onclick="async (args) => await OnEditRowAsync(data)" Style="cursor:pointer" />
-					<RadzenIcon Icon="delete" IconStyle="IconStyle.Danger" @onclick="async () => await OnDeleteAsync(data)" Style="cursor:pointer" />
+					<RadzenIcon Icon="edit" @onclick="async (args) => await OnEditRowAsync(data)" Style="cursor:pointer" Visible="@(!data.IsTotalCategory)" />
+					<RadzenIcon Icon="delete" IconStyle="IconStyle.Danger" @onclick="async () => await OnDeleteAsync(data)" Style="cursor:pointer" Visible="@(!data.IsTotalCategory)" />
 				</Template>
 				<EditTemplate Context="data">
-					<RadzenIcon Icon="check_circle" IconStyle="IconStyle.Success" @onclick="async (args) => await OnSaveRowAsync(data)" Style="cursor:pointer" />
-					<RadzenIcon Icon="cancel" IconStyle="IconStyle.Danger" @onclick="async (args) => await OnCancelEditAsync(data)" Style="cursor:pointer" />
+					<RadzenIcon Icon="check_circle" IconStyle="IconStyle.Success" @onclick="async (args) => await OnSaveRowAsync(data)" Style="cursor:pointer" Visible="@(!data.IsTotalCategory)" />
+					<RadzenIcon Icon="cancel" IconStyle="IconStyle.Danger" @onclick="async (args) => await OnCancelEditAsync(data)" Style="cursor:pointer" Visible="@(!data.IsTotalCategory)" />
 				</EditTemplate>
 			</RadzenDataGridColumn>
 		}
