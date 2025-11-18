@@ -1,0 +1,58 @@
+﻿@inherits LayoutComponentBase
+@inject AppStateManager AppStateManager
+
+<RadzenDialog />
+<RadzenNotification />
+
+<RadzenLayout>
+	<RadzenHeader>
+		<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="0">
+			<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Normal" Gap="0">
+				<RadzenSidebarToggle Click="@(async () => await OnToggleLeftSidebarExpansionAsync())" />
+				<RadzenLabel Text="Personal Finance Tracker" />
+			</RadzenStack>
+			<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0">
+				<RadzenDropDown @bind-Value=@selectedYear Data=@years Change="async () => await OnYearSelectionChangedAsync()" />
+			</RadzenStack>
+		</RadzenStack>
+	</RadzenHeader>
+	<RadzenSidebar Responsive="false" Style="width: max-content">
+		<RadzenPanelMenu DisplayStyle="@DisplayStyle" ShowArrow="true">
+			<RadzenPanelMenuItem Text="Dashboard" Icon="dashboard" Path="/" />
+			<RadzenPanelMenuItem Text="Budget Planner" Icon="date_range" Path="/budget-planner" />
+			<RadzenPanelMenuItem Text="Budget Tracker" Icon="grid_view" Path="#" />
+			<RadzenPanelMenuItem Text="Settings" Icon="settings" Path="#" />
+		</RadzenPanelMenu>
+	</RadzenSidebar>
+	<RadzenBody>
+		<div class="rz-p-4">
+			@Body
+		</div>
+	</RadzenBody>
+</RadzenLayout>
+
+@code {
+	int[] years = [2025, 2026, 2027, 2028, 2029, 2030]; // TODO refactor to remove hard-coded years
+	bool leftSidebarExpanded;
+	int selectedYear;
+	MenuItemDisplayStyle DisplayStyle => leftSidebarExpanded ? MenuItemDisplayStyle.IconAndText : MenuItemDisplayStyle.Icon;
+
+    protected async override Task OnInitializedAsync()
+    {
+        if (!AppStateManager.IsInitialized)
+            await AppStateManager.InitializeAsync();
+
+        leftSidebarExpanded = AppStateManager.State.LeftSidebarExpanded;
+        selectedYear = AppStateManager.State.Year;
+
+        await base.OnInitializedAsync();
+    }
+
+    async Task OnToggleLeftSidebarExpansionAsync()
+    {
+        leftSidebarExpanded = !leftSidebarExpanded;
+        await AppStateManager.SetLeftSidebarExpandedAsync(leftSidebarExpanded);
+    }
+
+    Task OnYearSelectionChangedAsync() => AppStateManager.SetYearAsync(selectedYear);
+}

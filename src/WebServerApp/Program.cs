@@ -5,6 +5,7 @@ using Application.Features.BudgetPlanning.GetCategoryDescription;
 using Application.Features.BudgetPlanning.UpdateBudget;
 using Application.Shared.Persistence;
 using Components;
+using Components.Shared;
 using Microsoft.EntityFrameworkCore;
 using Radzen;
 using WebServerApp;
@@ -21,6 +22,9 @@ builder.Services.AddRadzenComponents();
 builder.Services.AddScoped<DialogService>();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<ThemeService>();
+
+builder.Services.AddScoped<ICacheService, CacheService>();
+builder.Services.AddScoped<AppStateManager>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(
     options => options.UseSqlite(builder.Configuration.GetConnectionString("TrackerDb")));

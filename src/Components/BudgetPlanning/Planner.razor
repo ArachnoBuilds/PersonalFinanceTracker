@@ -1,26 +1,22 @@
 ﻿@using Application.Features.BudgetPlanning.GetBudget
 @using Application.Shared.Models
+@using Components.Shared
 @using Microsoft.Extensions.Logging
 @page "/budget-planner"
+@inherits StatefulComponent
 @inject GetBudgetHandler GetBudgetHandler
 @inject ILogger<Planner> Logger
 
 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Normal" Wrap="FlexWrap.Wrap">
-	<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Right" Wrap="FlexWrap.Wrap">
-		<RadzenLabel Text="Year:" />
-		<RadzenDropDown @bind-Value=@selectedYear Data=@years />
-	</RadzenStack>
-	<BudgetGrid Data="@summaries" Type="BudgetType.Summary" />
-	<BudgetGrid Year="@selectedYear"
-				@bind-Data="@incomes"
+	<BudgetGrid Data="@summaries"
+				Type="BudgetType.Summary" />
+	<BudgetGrid @bind-Data="@incomes"
 				Type="BudgetType.Income"
 				RecalculateBudgetSummary="@RecalculateSummary" />
-	<BudgetGrid Year="@selectedYear"
-				@bind-Data="@expenses"
+	<BudgetGrid @bind-Data="@expenses"
 				Type="BudgetType.Expenses"
 				RecalculateBudgetSummary="@RecalculateSummary" />
-	<BudgetGrid Year="@selectedYear"
-				@bind-Data="@savings"
+	<BudgetGrid @bind-Data="@savings"
 				Type="BudgetType.Savings"
 				RecalculateBudgetSummary="@RecalculateSummary" />
 </RadzenStack>

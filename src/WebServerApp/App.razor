@@ -9,12 +9,12 @@
     <link rel="stylesheet" href="@Assets["app.css"]" />
     <link rel="stylesheet" href="@Assets["WebServerApp.styles.css"]" />
     <ImportMap />
-    <HeadOutlet @rendermode="InteractiveServer" />
+    <HeadOutlet @rendermode="new InteractiveServerRenderMode(prerender: false)" />
     <RadzenTheme Theme="material" />
 </head>
 
 <body>
-    <Routes @rendermode="InteractiveServer" />
+    <Routes @rendermode="new InteractiveServerRenderMode(prerender: false)" />
     <ReconnectModal />
     <script src="@Assets["_framework/blazor.web.js"]"></script>
     <script src="_content/Radzen.Blazor/Radzen.Blazor.js?v=@(typeof(Radzen.Colors).Assembly.GetName().Version)"></script>

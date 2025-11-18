@@ -3,7 +3,9 @@
 @using Application.Features.BudgetPlanning.GetCategoryDescription
 @using Application.Features.BudgetPlanning.UpdateBudget
 @using Application.Shared.Models
+@using Components.Shared
 @using Microsoft.Extensions.Logging
+@inherits StatefulComponent
 @inject GetCategoryDescriptionHandler GetCategoryDescriptionHandler
 @inject CreateBudgetHandler CreateBudgetHandler
 @inject UpdateBudgetHandler UpdateBudgetHandler

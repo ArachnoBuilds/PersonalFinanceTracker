@@ -10,8 +10,6 @@ namespace Components.BudgetPlanning;
 public partial class BudgetGrid
 {
     [Parameter]
-    public int Year { get; set; }
-    [Parameter]
     public BudgetType Type { get; set; } = BudgetType.Summary;
     [Parameter]
     public List<Models.Budget> Data { get; set; } = [];
@@ -33,6 +31,8 @@ public partial class BudgetGrid
 
     protected override async Task OnInitializedAsync()
     {
+        await base.OnInitializedAsync();
+
         if (Type is not BudgetType.Summary)
         {
             var getterResult = await GetCategoryDescriptionHandler.DoAsync(new(Type));
@@ -45,7 +45,6 @@ public partial class BudgetGrid
         }
         // TODO check later if this is needed
         //categories.RemoveAll(p => Data.Exists(d => d.CategoryDesc == p.Description));
-        await base.OnInitializedAsync();
     }
 
     async Task OnAddRowAsync()
@@ -159,7 +158,7 @@ public partial class BudgetGrid
             return;
 
         var annualBudget = budget.ToAnnualBudget();
-        var result = await CreateBudgetHandler.DoAsync(new(Year, Type, annualBudget)).ConfigureAwait(false);
+        var result = await CreateBudgetHandler.DoAsync(new(State.Year, Type, annualBudget)).ConfigureAwait(false);
         if (result.IsFailure)
         {
             Logger.LogError("Failed to create budget: {Error}", result.Error);
@@ -183,7 +182,7 @@ public partial class BudgetGrid
             return;
 
         var annualBudget = budget.ToAnnualBudget();
-        var result = await UpdateBudgetHandler.DoAsync(new(Year, annualBudget)).ConfigureAwait(false);
+        var result = await UpdateBudgetHandler.DoAsync(new(State.Year, annualBudget)).ConfigureAwait(false);
         if (result.IsFailure)
         {
             Logger.LogError("Failed to update budget: {Error}", result.Error);
@@ -213,7 +212,7 @@ public partial class BudgetGrid
         if (confirm.HasValue && !confirm.Value)
             return;
 
-        var result = await DeleteBudgetHandler.DoAsync(new(Year, budget.CategoryId)).ConfigureAwait(false);
+        var result = await DeleteBudgetHandler.DoAsync(new(State.Year, budget.CategoryId)).ConfigureAwait(false);
         if (result.IsFailure)
         {
             Logger.LogError("Failed to delete budget: {Error}", result.Error);

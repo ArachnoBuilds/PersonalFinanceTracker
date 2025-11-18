@@ -2,7 +2,6 @@ using Application.Features.BudgetPlanning.Models;
 using Application.Shared;
 using Application.Shared.Models;
 using Microsoft.Extensions.Logging;
-using Radzen;
 
 namespace Components.BudgetPlanning;
 
@@ -10,8 +9,6 @@ using AnnualBudgetsResult = Result<List<AnnualBudget>>;
 
 public partial class Planner
 {
-    int[] years = [];
-    int selectedYear;
     List<Models.Budget> summaries = [];
     List<Models.Budget> incomes = [];
     List<Models.Budget> expenses = [];
@@ -19,16 +16,16 @@ public partial class Planner
 
     protected override async Task OnInitializedAsync()
     {
-        years = [2025, 2026, 2027, 2028, 2029, 2030];
-        selectedYear = 2025;
+        await base.OnInitializedAsync();
+
+        AppStateManager.OnYearChangedAsync -= PrepareBudgetsAsync;
+        AppStateManager.OnYearChangedAsync += PrepareBudgetsAsync;
 
         // prepare budgets for the selected year
-        await PrepareBudgetsAsync();
-
-        await base.OnInitializedAsync();
+        await PrepareBudgetsAsync(State.Year);
     }
 
-    async Task PrepareBudgetsAsync() 
+    async Task PrepareBudgetsAsync(int selectedYear) 
     {
         // fetch budgets for the selected year
         List<Task<AnnualBudgetsResult>> getters = [
@@ -63,6 +60,8 @@ public partial class Planner
 
         // calculate summary
         RecalculateSummary();
+
+        StateHasChanged();
     }
     void RecalculateSummary()
     {
