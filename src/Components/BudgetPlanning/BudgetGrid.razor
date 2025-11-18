@@ -21,7 +21,7 @@
 				RowUpdate="@OnUpdateAsync"
 				TItem="Models.Budget"
 				Data="@Data"
-				Style="overflow:scroll">
+				Style="@($"overflow:scroll{(Type is not BudgetType.Summary ? "; max-height: 23vh" : string.Empty)}")">
 	<Columns>
 		@if (Type != BudgetType.Summary)
 		{
