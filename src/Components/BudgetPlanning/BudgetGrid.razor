@@ -274,7 +274,7 @@
 	{
 		@if (amount != 0)
 		{
-			@Render(amount.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-IN")), isTotalCategory)
+			@Render(amount.ToCurrency(), isTotalCategory)
 		}
 		else
 		{
