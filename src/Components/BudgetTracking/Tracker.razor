@@ -1,0 +1,26 @@
+﻿@using Application.Shared.Models
+@using Components.BudgetTracking.Models
+@using Components.Shared
+@page "/budget-tracker"
+@inherits StatefulComponent
+
+<TransactionGrid Data="@data" />
+
+@code {
+	List<Transaction> data = [];
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+
+		// initialize
+		data = 
+		[
+			new Transaction(new DateTime(2025, 11, 10), BudgetType.Income, "Salary", 5000.00m, "Abc Ltd.", "Salary of November 2025"),
+			new Transaction(new DateTime(2025, 11, 12), BudgetType.Expenses, "Household", 1000.00m, "Salary A/c", "Grocery bill"),
+			new Transaction(new DateTime(2025, 11, 12), BudgetType.Expenses, "Household", 500.00m, "Salary A/c", "Utility bill"),
+			new Transaction(new DateTime(2025, 11, 13), BudgetType.Savings, "Emergency fund", 500.00m, "Salary A/c", "Emergency fund"),
+			new Transaction(new DateTime(2025, 11, 14), BudgetType.Expenses, "Household", 250.00m, "Cash", "Broadband bill")
+		];
+	}
+}

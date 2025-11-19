@@ -1,0 +1,84 @@
+﻿@using Components.BudgetTracking.Models
+@using Components.Shared
+
+<RadzenDataGrid @ref="@grid"
+				Responsive="true"
+				AllowColumnResize="true"
+				AllowAlternatingRows="true"
+				EditMode="DataGridEditMode.Single"
+				Density="Density.Compact"
+				TItem="Transaction"
+				Data="@Data">
+	<Columns>
+		<RadzenDataGridColumn Width="25px"
+							  Property="Date"
+							  Title="Date"
+							  TextAlign="TextAlign.Left">
+			<Template Context="data">
+				@data.Date.ToString("d")
+			</Template>
+			<EditTemplate Context="data">
+
+			</EditTemplate>
+		</RadzenDataGridColumn>
+		<RadzenDataGridColumn Width="25px"
+							  Property="BudgetType"
+							  Title="Budget Type"
+							  TextAlign="TextAlign.Left">
+			<EditTemplate Context="data">
+
+			</EditTemplate>
+		</RadzenDataGridColumn>
+		<RadzenDataGridColumn Width="25px"
+							  Property="BudgetCategory"
+							  Title="Budget Category"
+							  TextAlign="TextAlign.Left">
+			<EditTemplate Context="data">
+
+			</EditTemplate>
+		</RadzenDataGridColumn>
+		<RadzenDataGridColumn Width="25px"
+							  Property="Amount"
+							  Title="Amount"
+							  TextAlign="TextAlign.Right">
+			<Template Context="data">
+				@data.Amount.ToCurrency()
+			</Template>
+			<EditTemplate Context="data">
+
+			</EditTemplate>
+		</RadzenDataGridColumn>
+		<RadzenDataGridColumn Width="75px"
+							  Property="Description"
+							  Title="Description"
+							  TextAlign="TextAlign.Left">
+			<EditTemplate Context="data">
+
+			</EditTemplate>
+		</RadzenDataGridColumn>
+		<RadzenDataGridColumn Width="75px"
+							  Filterable="false"
+							  Sortable="false"
+							  TextAlign="TextAlign.Right">
+			<HeaderTemplate>
+				<RadzenButton Icon="add_circle" Text="Add" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Small" />
+			</HeaderTemplate>
+			<Template Context="data">
+				<RadzenIcon Icon="edit" Style="cursor:pointer" />
+				<RadzenIcon Icon="delete" IconStyle="IconStyle.Danger" Style="cursor:pointer" />
+			</Template>
+			<EditTemplate Context="data">
+				<RadzenIcon Icon="check_circle" IconStyle="IconStyle.Success" Style="cursor:pointer" />
+				<RadzenIcon Icon="cancel" IconStyle="IconStyle.Danger" Style="cursor:pointer" />
+			</EditTemplate>
+		</RadzenDataGridColumn>
+	</Columns>
+</RadzenDataGrid>
+
+@code {
+	[Parameter]
+	public List<Transaction> Data { get; set; } = [];
+
+	RadzenDataGrid<Transaction>? grid;
+
+}
