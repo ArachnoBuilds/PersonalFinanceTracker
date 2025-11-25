@@ -1,32 +1,32 @@
-﻿using BPM = Application.Features.BudgetPlanning.Models;
+﻿using SM = Application.Shared.Models;
 using Application.Shared;
 using Application.Shared.Models;
 using Application.Shared.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Features.BudgetPlanning.GetCategoryDescription;
+namespace Application.Features.BudgetPlanning.GetCategory;
 
-public class GetCategoryDescriptionHandler(ApplicationDbContext context)
+public class GetCategoryHandler(ApplicationDbContext context)
 {
-    public async Task<Result<List<BPM.Category>>> DoAsync(GetCategoryDescriptionQuery query, CancellationToken cancellation = default)
+    public async Task<Result<List<SM.Category>>> DoAsync(GetCategoryQuery query, CancellationToken cancellation = default)
     {
         if (query.Type is BudgetType.Summary)
             return Errors.BudgetTypeSummaryNotAllowed;
 
         var type = query.Type.ToString();
-        List<BPM.Category> descriptions;
+        List<SM.Category> descriptions;
         try
         {
             descriptions = await context.Categories
                             .AsNoTracking()
                             .Where(p => p.Type == type)
-                            .Select(p => new BPM.Category(p.Id, p.Description))
+                            .Select(p => new SM.Category(p.Id, p.Description))
                             .ToListAsync(cancellation)
                             .ConfigureAwait(false);
         }
         catch (Exception exc)
         {
-            return Result.Failure<List<BPM.Category>>(exc);
+            return Result.Failure<List<SM.Category>>(exc);
         }
         return descriptions;
     }
