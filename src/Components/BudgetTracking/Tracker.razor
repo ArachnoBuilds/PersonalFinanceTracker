@@ -14,13 +14,48 @@
 		await base.OnInitializedAsync();
 
 		// initialize
-		data = 
+		data =
 		[
-			new Transaction(new DateTime(2025, 11, 10), BudgetType.Income, "Salary", 5000.00m, "Abc Ltd.", "Salary of November 2025"),
-			new Transaction(new DateTime(2025, 11, 12), BudgetType.Expenses, "Household", 1000.00m, "Salary A/c", "Grocery bill"),
-			new Transaction(new DateTime(2025, 11, 12), BudgetType.Expenses, "Household", 500.00m, "Salary A/c", "Utility bill"),
-			new Transaction(new DateTime(2025, 11, 13), BudgetType.Savings, "Emergency fund", 500.00m, "Salary A/c", "Emergency fund"),
-			new Transaction(new DateTime(2025, 11, 14), BudgetType.Expenses, "Household", 250.00m, "Cash", "Broadband bill")
+			new(){
+				Date = new DateTime(2025, 11, 14),
+				BudgetType = BudgetType.Expenses,
+				BudgetCategory = new(1, "Household"),
+				Amount = 200.00m,
+				Account = "Cash",
+				Description = "Broadband bill"
+		},
+			new(){
+				Date = new DateTime(2025, 11, 13),
+				BudgetType = BudgetType.Savings,
+				BudgetCategory = new(2, "Emergency fund"),
+				Amount = 500.00m,
+				Account = "Salary A/c",
+				Description = "Emergency fund"
+		},
+			new(){
+				Date = new DateTime(2025, 11, 12),
+				BudgetType = BudgetType.Expenses,
+				BudgetCategory = new(3, "Household"),
+				Amount = 500.00m,
+				Account = "Salary A/c",
+				Description = "Utility bill"
+		},
+			new(){
+				Date = new DateTime(2025, 11, 12),
+				BudgetType = BudgetType.Expenses,
+				BudgetCategory = new(4, "Household"),
+				Amount = 500.00m,
+				Account = "Salary A/c",
+				Description = "Grocery bill"
+		},
+			new(){
+				Date = new DateTime(2025, 11, 10),
+				BudgetType = BudgetType.Income,
+				BudgetCategory = new(5, "Salary"),
+				Amount = 5000.00m,
+				Account = "Salary A/c",
+				Description = "Salary of Nov 25"
+		}
 		];
 	}
 }

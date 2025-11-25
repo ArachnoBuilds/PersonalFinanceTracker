@@ -1,5 +1,11 @@
-﻿@using Components.BudgetTracking.Models
+﻿@using Application.Features.BudgetTracking.GetCategory
+@using Application.Shared.Models
+@using Components.BudgetTracking.Models
 @using Components.Shared
+@using Microsoft.Extensions.Logging
+@inherits StatefulComponent
+@inject GetCategoryHandler GetCategoryHandler
+@inject ILogger<TransactionGrid> Logger
 
 <RadzenDataGrid @ref="@grid"
 				Responsive="true"
@@ -7,6 +13,8 @@
 				AllowAlternatingRows="true"
 				EditMode="DataGridEditMode.Single"
 				Density="Density.Compact"
+				RowCreate="@OnCreateAsync"
+				RowUpdate="@OnUpdateAsync"
 				TItem="Transaction"
 				Data="@Data">
 	<Columns>
@@ -18,7 +26,7 @@
 				@data.Date.ToString("d")
 			</Template>
 			<EditTemplate Context="data">
-
+				<RadzenDatePicker @bind-Value="@data.Date" ShowCalendarWeek="true" />
 			</EditTemplate>
 		</RadzenDataGridColumn>
 		<RadzenDataGridColumn Width="25px"
@@ -26,15 +34,18 @@
 							  Title="Budget Type"
 							  TextAlign="TextAlign.Left">
 			<EditTemplate Context="data">
-
+				<RadzenDropDown @bind-Value="@data.BudgetType" Data="@budgetTypes" Change="async (args) => await OnBudgetTypeChangedAsync(args)" />
 			</EditTemplate>
 		</RadzenDataGridColumn>
 		<RadzenDataGridColumn Width="25px"
-							  Property="BudgetCategory"
+							  Property="BudgetCategory.Description"
 							  Title="Budget Category"
 							  TextAlign="TextAlign.Left">
 			<EditTemplate Context="data">
-
+				<RadzenDropDown @bind-Value="@selectedCategoryId"
+								Data="@categories"
+								TextProperty="Description"
+								ValueProperty="Id" />
 			</EditTemplate>
 		</RadzenDataGridColumn>
 		<RadzenDataGridColumn Width="25px"
@@ -45,7 +56,8 @@
 				@data.Amount.ToCurrency()
 			</Template>
 			<EditTemplate Context="data">
-
+				<RadzenNumeric Name="Amount" @bind-Value="@data.Amount" Min="0" ShowUpDown="false" Style="width:100%" />
+				<RadzenNumericRangeValidator Component="Amount" Min="0.00m" Text="Amount can't be less than zero" Popup="true" Style="display: block" />
 			</EditTemplate>
 		</RadzenDataGridColumn>
 		<RadzenDataGridColumn Width="75px"
@@ -53,32 +65,32 @@
 							  Title="Description"
 							  TextAlign="TextAlign.Left">
 			<EditTemplate Context="data">
-
+				<RadzenTextArea @bind-Value="@data.Description" />
 			</EditTemplate>
+		</RadzenDataGridColumn>
+		<RadzenDataGridColumn Width="25px"
+							  Property="EffectiveDate"
+							  Title="Effective Date"
+							  TextAlign="TextAlign.Left">
+			<Template Context="data">
+				@data.EffectiveDate.ToString("d")
+			</Template>
 		</RadzenDataGridColumn>
 		<RadzenDataGridColumn Width="75px"
 							  Filterable="false"
 							  Sortable="false"
 							  TextAlign="TextAlign.Right">
 			<HeaderTemplate>
-				<RadzenButton Icon="add_circle" Text="Add" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Small" />
+				<RadzenButton Icon="add_circle" Text="Add" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Small" Click="@OnAddRowAsync" />
 			</HeaderTemplate>
 			<Template Context="data">
-				<RadzenIcon Icon="edit" Style="cursor:pointer" />
-				<RadzenIcon Icon="delete" IconStyle="IconStyle.Danger" Style="cursor:pointer" />
+				<RadzenIcon Icon="edit" @onclick="async (args) => await OnEditRowAsync(data)" Style="cursor:pointer" />
+				<RadzenIcon Icon="delete" IconStyle="IconStyle.Danger" @onclick="async () => await OnDeleteAsync(data)" Style="cursor:pointer" />
 			</Template>
 			<EditTemplate Context="data">
-				<RadzenIcon Icon="check_circle" IconStyle="IconStyle.Success" Style="cursor:pointer" />
-				<RadzenIcon Icon="cancel" IconStyle="IconStyle.Danger" Style="cursor:pointer" />
+				<RadzenIcon Icon="check_circle" IconStyle="IconStyle.Success" @onclick="async (args) => await OnSaveRowAsync(data)" Style="cursor:pointer" />
+				<RadzenIcon Icon="cancel" IconStyle="IconStyle.Danger" @onclick="async (args) => await OnCancelEditAsync(data)" Style="cursor:pointer" />
 			</EditTemplate>
 		</RadzenDataGridColumn>
 	</Columns>
 </RadzenDataGrid>
-
-@code {
-	[Parameter]
-	public List<Transaction> Data { get; set; } = [];
-
-	RadzenDataGrid<Transaction>? grid;
-
-}
