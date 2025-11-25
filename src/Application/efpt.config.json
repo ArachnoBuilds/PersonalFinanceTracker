@@ -19,11 +19,23 @@
    "T4TemplatePath": null,
    "Tables": [
       {
+         "Name": "Account",
+         "ObjectType": 0
+      },
+      {
          "Name": "Budget",
          "ObjectType": 0
       },
       {
          "Name": "Category",
+         "ObjectType": 0
+      },
+      {
+         "Name": "Transaction",
+         "ObjectType": 0
+      },
+      {
+         "Name": "Year",
          "ObjectType": 0
       }
    ],

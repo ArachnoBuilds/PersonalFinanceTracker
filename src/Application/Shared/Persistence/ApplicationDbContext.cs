@@ -13,12 +13,25 @@ public partial class ApplicationDbContext : DbContext
     {
     }
 
+    public virtual DbSet<Account> Accounts { get; set; }
+
     public virtual DbSet<Budget> Budgets { get; set; }
 
     public virtual DbSet<Category> Categories { get; set; }
 
+    public virtual DbSet<Transaction> Transactions { get; set; }
+
+    public virtual DbSet<Year> Years { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Account>(entity =>
+        {
+            entity.HasKey(e => e.Value);
+
+            entity.ToTable("Account");
+        });
+
         modelBuilder.Entity<Budget>(entity =>
         {
             entity.ToTable("Budget");
@@ -27,6 +40,10 @@ public partial class ApplicationDbContext : DbContext
 
             entity.HasOne(d => d.Category).WithMany(p => p.Budgets)
                 .HasForeignKey(d => d.CategoryId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+
+            entity.HasOne(d => d.YearNavigation).WithMany(p => p.Budgets)
+                .HasForeignKey(d => d.Year)
                 .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
@@ -37,6 +54,34 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Description).IsRequired();
             entity.Property(e => e.Type).IsRequired();
+        });
+
+        modelBuilder.Entity<Transaction>(entity =>
+        {
+            entity.ToTable("Transaction");
+
+            entity.Property(e => e.Account).IsRequired();
+            entity.Property(e => e.BudgetId)
+                .IsRequired()
+                .HasColumnName("Budget_Id");
+            entity.Property(e => e.Date).IsRequired();
+
+            entity.HasOne(d => d.AccountNavigation).WithMany(p => p.Transactions)
+                .HasForeignKey(d => d.Account)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+
+            entity.HasOne(d => d.Budget).WithMany(p => p.Transactions)
+                .HasForeignKey(d => d.BudgetId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+        });
+
+        modelBuilder.Entity<Year>(entity =>
+        {
+            entity.HasKey(e => e.Value);
+
+            entity.ToTable("Year");
+
+            entity.Property(e => e.Value).ValueGeneratedNever();
         });
 
         OnModelCreatingPartial(modelBuilder);

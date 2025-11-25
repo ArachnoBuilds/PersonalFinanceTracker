@@ -18,4 +18,8 @@ public partial class Budget
     public int CategoryId { get; set; }
 
     public virtual Category Category { get; set; }
+
+    public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
+
+    public virtual Year YearNavigation { get; set; }
 }
