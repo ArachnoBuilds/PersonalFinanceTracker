@@ -1,12 +1,13 @@
 ﻿@using Application.Features.BudgetPlanning.CreateBudget
 @using Application.Features.BudgetPlanning.DeleteBudget
-@using Application.Features.BudgetPlanning.GetCategoryDescription
+@using Application.Features.BudgetPlanning.GetCategory
 @using Application.Features.BudgetPlanning.UpdateBudget
 @using Application.Shared.Models
 @using Components.Shared
+@using Components.Shared.Models
 @using Microsoft.Extensions.Logging
 @inherits StatefulComponent
-@inject GetCategoryDescriptionHandler GetCategoryDescriptionHandler
+@inject GetCategoryHandler GetCategoryDescriptionHandler
 @inject CreateBudgetHandler CreateBudgetHandler
 @inject UpdateBudgetHandler UpdateBudgetHandler
 @inject DeleteBudgetHandler DeleteBudgetHandler
@@ -47,7 +48,7 @@
 				<EditTemplate Context="data">
 					@switch (operation)
 					{
-						case Operation.Create:
+						case GridOperation.Create:
 							<RadzenAutoComplete Name="Category"
 												Data="@categories"
 												TextProperty="Description"
@@ -56,7 +57,7 @@
 												FilterOperator="StringFilterOperator.Contains"
 												Style="width: 100%" />
 							break;
-						case Operation.Update:
+						case GridOperation.Update:
 							<RadzenTextBox Name="Category"
 										   @bind-Value="@selectedCategoryDesc"
 										   Style="width:100%" />

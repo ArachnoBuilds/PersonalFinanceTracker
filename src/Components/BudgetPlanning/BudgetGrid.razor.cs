@@ -1,5 +1,5 @@
-﻿using Application.Features.BudgetPlanning.Models;
-using Application.Shared.Models;
+﻿using Application.Shared.Models;
+using Components.Shared.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 using Radzen;
@@ -19,14 +19,13 @@ public partial class BudgetGrid
     public EventCallback RecalculateBudgetSummary { get; set; }
 
     RadzenDataGrid<Models.Budget>? grid;
-    Models.Budget? editable;
     List<Category> categories = [];
     string FirstColumnHeader => Type switch
     {
         BudgetType.Summary => string.Empty,
         _ => Type.ToString()
     };
-    Operation operation = Operation.None;
+    GridOperation operation = GridOperation.None;
     string selectedCategoryDesc = string.Empty;
 
     protected override async Task OnInitializedAsync()
@@ -43,20 +42,23 @@ public partial class BudgetGrid
             }
             categories = getterResult.Value;
         }
-        // TODO check later if this is needed
-        //categories.RemoveAll(p => Data.Exists(d => d.CategoryDesc == p.Description));
+    }
+
+    void Reset()
+    {
+        operation = GridOperation.None;
+        selectedCategoryDesc = string.Empty;
     }
 
     async Task OnAddRowAsync()
     {
-        // TODO notification should be more specific
-        if (grid == null || !grid.IsValid || operation is not Operation.None)
+        if (grid == null || !grid.IsValid || operation is not GridOperation.None)
         {
-            Notifier.Notify(NotificationSeverity.Error, NotificationMessages.BudgetCreationFailed);
+            Notifier.Notify(NotificationSeverity.Error, NotificationMessages.BudgetCreateInitializationFailed);
             return;
         }
 
-        operation = Operation.Create;
+        operation = GridOperation.Create;
         selectedCategoryDesc = string.Empty;
         await grid.InsertRow(new()
         {
@@ -66,28 +68,26 @@ public partial class BudgetGrid
 
     async Task OnEditRowAsync(Models.Budget budget)
     {
-        // TODO notification should be more specific
-        if (grid == null || !grid.IsValid || operation is not Operation.None)
+        if (grid == null || !grid.IsValid || operation is not GridOperation.None)
         {
-            Notifier.Notify(NotificationSeverity.Error, NotificationMessages.BudgetUpdationFailed);
+            Notifier.Notify(NotificationSeverity.Error, NotificationMessages.BudgetUpdateInitializationFailed);
             return;
         }
 
-        operation = Operation.Update;
+        operation = GridOperation.Update;
         selectedCategoryDesc = budget.CategoryDesc;
         await grid.EditRow(budget);
     }
 
     async Task OnSaveRowAsync(Models.Budget budget)
     {
-        // TODO add notification 
         if (grid == null || !grid.IsValid)
             return;
 
         // set category details based on operation
         switch (operation)
         {
-            case Operation.Create:
+            case GridOperation.Create:
                 {
                     // validate
                     if (Data.Exists(p => p.CategoryDesc == selectedCategoryDesc))
@@ -110,7 +110,7 @@ public partial class BudgetGrid
                     }
                     break;
                 }
-            case Operation.Update:
+            case GridOperation.Update:
                 {
                     // validate
                     if (Data.Exists(p => p.CategoryId != budget.CategoryId && p.CategoryDesc == selectedCategoryDesc))
@@ -133,10 +133,7 @@ public partial class BudgetGrid
 
         // save changes
         await grid.UpdateRow(budget);
-
-        // reset
-        selectedCategoryDesc = string.Empty;
-        operation = Operation.None;
+        Reset();
     }
 
     async Task OnCancelEditAsync(Models.Budget budget)
@@ -144,17 +141,14 @@ public partial class BudgetGrid
         if (grid == null)
             return;
 
+        // cancel changes
         grid.CancelEditRow(budget);
-
-        if (editable == null)
-            return;
-        budget = editable!;
-        editable = null;
+        Reset();
     }
 
     async Task OnCreateAsync(Models.Budget budget)
     {
-        if (operation is not Operation.Create)
+        if (operation is not GridOperation.Create)
             return;
 
         var annualBudget = budget.ToAnnualBudget();
@@ -173,12 +167,12 @@ public partial class BudgetGrid
             await RecalculateBudgetSummary.InvokeAsync();
             Notifier.Notify(NotificationSeverity.Success, NotificationMessages.BudgetCreationSuccess);
         }
-
+        Reset();
     }
 
     async Task OnUpdateAsync(Models.Budget budget)
     {
-        if (operation is not Operation.Update)
+        if (operation is not GridOperation.Update)
             return;
 
         var annualBudget = budget.ToAnnualBudget();
@@ -197,6 +191,7 @@ public partial class BudgetGrid
             await RecalculateBudgetSummary.InvokeAsync();
             Notifier.Notify(NotificationSeverity.Success, NotificationMessages.BudgetUpdationSuccess);
         }
+        Reset();
     }
 
     async Task OnDeleteAsync(Models.Budget budget)
@@ -229,10 +224,5 @@ public partial class BudgetGrid
         }
 
         await grid.Reload();
-    }
-
-    enum Operation
-    {
-        Create, Update, Delete, None
     }
 }
