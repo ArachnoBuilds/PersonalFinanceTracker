@@ -1,16 +1,17 @@
-﻿using Application.Shared;
+﻿using Application.Schema.BudgetPlanning.CreateBudget;
+using Application.Schema.Shared;
 using Application.Shared.Persistence;
 
-namespace Application.Features.BudgetPlanning.CreateBudget;
+namespace Application.Features.BudgetPlanning;
 
-public class CreateBudgetHandler(ApplicationDbContext context)
+public class CreateBudgetHandler(ApplicationDbContext context) : IHandler
 {
-    public async Task<Result<int>> DoAsync(CreateBudgetCommand command)
+    public async Task<Result<int>> DoAsync(Command command, CancellationToken cancellationToken = default)
     {
-        int categoryId = -1;
+        int categoryId;
         try
         {
-            if (command.Budget.CategoryId == -1)
+            if (command.Budget.BudgetItemId == -1)
             {
                 // fetch counts of existing categories
                 var count = context.Categories.Count();
@@ -26,13 +27,13 @@ public class CreateBudgetHandler(ApplicationDbContext context)
             }
             else
             {
-                categoryId = command.Budget.CategoryId;
+                categoryId = command.Budget.BudgetItemId;
 
                 // create budgets only
                 var budgets = command.Budget.ToBudgets(command.Year);
                 context.Budgets.AddRange(budgets);
             }
-            await context.SaveChangesAsync().ConfigureAwait(false);
+            await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         }
         catch (Exception exc)
         {

@@ -1,17 +1,17 @@
-﻿using Application.Features.BudgetPlanning.Models;
-using Application.Shared.Models;
+﻿using Application.Schema.BudgetPlanning.Models;
+using Application.Schema.Shared.Models;
 using PM = Application.Shared.Persistence;
 
 namespace Application.Features.BudgetPlanning;
 
 internal static class Extensions
 {
-    extension(AnnualBudget annualBudget)
+    extension(Budget budget)
     {
-        public PM.Category ToCategory(BudgetType type, int? id = null) => new()
+        public PM.Category ToCategory(BudgetItemType type, int? id = null) => new()
         {
-            Id = id ?? annualBudget.CategoryId,
-            Description = annualBudget.CategoryDesc,
+            Id = id ?? budget.BudgetItemId,
+            Description = budget.BudgetItemDesc,
             Type = type.ToString()
         };
 
@@ -27,8 +27,8 @@ internal static class Extensions
                     Id = Guid.NewGuid().ToString(),
                     Year = year,
                     Month = (int)month,
-                    Amount = (double)annualBudget.Budgets.GetValueOrDefault(month, 0),
-                    CategoryId = id ?? annualBudget.CategoryId
+                    Amount = (double)budget.MonthlyAmounts.GetValueOrDefault(month, 0),
+                    CategoryId = id ?? budget.BudgetItemId
                 });
             }
             return budgets;

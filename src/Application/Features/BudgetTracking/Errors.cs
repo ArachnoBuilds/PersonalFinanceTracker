@@ -1,4 +1,4 @@
-﻿using Application.Shared;
+﻿using Application.Schema.Shared;
 
 namespace Application.Features.BudgetTracking;
 
