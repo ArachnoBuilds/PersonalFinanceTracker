@@ -1,5 +1,7 @@
-using BudgetPlanning = Application.Features.BudgetPlanning;
-using BudgetTracking = Application.Features.BudgetTracking;
+using BP = Application.Features.BudgetPlanning;
+using SBP = Application.Schema.BudgetPlanning;
+using BT = Application.Features.BudgetTracking;
+using SBT = Application.Schema.BudgetTracking;
 using Application.Shared.Persistence;
 using Components;
 using Components.Shared;
@@ -25,13 +27,16 @@ builder.Services.AddScoped<AppStateManager>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(
     options => options.UseSqlite(builder.Configuration.GetConnectionString("TrackerDb")));
-builder.Services.AddScoped<BudgetPlanning.GetBudget.GetBudgetHandler>();
-builder.Services.AddScoped<BudgetPlanning.GetCategory.GetCategoryHandler>();
-builder.Services.AddScoped<BudgetPlanning.CreateBudget.CreateBudgetHandler>();
-builder.Services.AddScoped<BudgetPlanning.UpdateBudget.UpdateBudgetHandler>();
-builder.Services.AddScoped<BudgetPlanning.DeleteBudget.DeleteBudgetHandler>();
-builder.Services.AddScoped<BudgetTracking.GetCategory.GetCategoryHandler>();
-builder.Services.AddScoped<BudgetTracking.GetTransaction.Handler>();
+
+builder.Services.AddScoped<SBP.GetBudget.IHandler, BP.GetBudgetHandler>();
+builder.Services.AddScoped<SBP.GetBudgetItem.IHandler, BP.GetCategoryHandler>();
+builder.Services.AddScoped<SBP.CreateBudget.IHandler, BP.CreateBudgetHandler>();
+builder.Services.AddScoped<SBP.UpdateBudget.IHandler, BP.UpdateBudgetHandler>();
+builder.Services.AddScoped<SBP.DeleteBudget.IHandler, BP.DeleteBudgetHandler>();
+
+builder.Services.AddScoped<SBT.GetBudget.IHandler, BT.GetBudgetHandler>();
+builder.Services.AddScoped<SBT.GetTransaction.IHandler, BT.GetTransactionHandler>();
+builder.Services.AddScoped<SBT.CreateTransaction.IHandler, BT.CreateTransactionHandler>();
 
 var app = builder.Build();
 
