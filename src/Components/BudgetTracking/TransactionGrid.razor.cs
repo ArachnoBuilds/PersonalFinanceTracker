@@ -1,3 +1,4 @@
+using Application.Shared;
 using Application.Shared.Models;
 using Components.BudgetTracking.Models;
 using Components.Shared.Models;
@@ -16,26 +17,50 @@ public partial class TransactionGrid
     RadzenDataGrid<Transaction>? grid;
     readonly BudgetType[] budgetTypes = [BudgetType.Income, BudgetType.Expenses, BudgetType.Savings];
     List<Category> categories = [];
+    Dictionary<BudgetType, List<Category>> categoriesByType = [];
     int selectedCategoryId;
     GridOperation operation = GridOperation.None;
 
     protected async override Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+
+        // initialize categories for the selected year
+        List<Task<Result<List<Category>>>> getters =
+        [
+            GetCategoryHandler.DoAsync(new(BudgetType.Income, State.Year)),
+            GetCategoryHandler.DoAsync(new(BudgetType.Expenses, State.Year)),
+            GetCategoryHandler.DoAsync(new(BudgetType.Savings, State.Year))
+        ];
+        await Task.WhenAll(getters).ConfigureAwait(false);
+        if (getters.Exists(p => p.Result.IsFailure))
+        {
+            getters
+                .FindAll(p => p.Result.IsFailure)
+                .ForEach(p =>
+                {
+                    if (!Logger.IsEnabled(LogLevel.Error))
+                        return;
+                    Logger.LogError("Error fetching budget categories for year {Year}: {Error}",
+                        State.Year,
+                        p.Result.Error);
+                });
+            Notifier.Notify(NotificationSeverity.Error, NotificationMessages.CategoryFetchFailed);
+            return;
+        }
+        categoriesByType = new()
+        {
+            [BudgetType.Income] = getters[0].Result.Value,
+            [BudgetType.Expenses] = getters[1].Result.Value,
+            [BudgetType.Savings] = getters[2].Result.Value
+        };
     }
 
     async Task OnBudgetTypeChangedAsync(object arg)
     {
         if (arg is not BudgetType type)
             return;
-        var getterResult = await GetCategoryHandler.DoAsync(new(type, State.Year));
-        if (getterResult.IsFailure)
-        {
-            Logger.LogError("Failed to get category descriptions for budget type {Type}: {Error}", type, getterResult.Error);
-            Notifier.Notify(NotificationSeverity.Error, NotificationMessages.CategoryFetchFailed);
-            return;
-        }
-        categories = getterResult.Value;
+        categories = categoriesByType.GetValueOrDefault(type, []);
     }
 
     void Reset()
