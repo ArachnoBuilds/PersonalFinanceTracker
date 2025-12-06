@@ -3,7 +3,7 @@ using Application.Schema.Shared;
 
 namespace Application.Schema.BudgetPlanning.UpdateBudget;
 
-public record Command(int Year, Budget Budget);
+public record Command(int Year, Budget Data);
 
 public interface IHandler
 {
