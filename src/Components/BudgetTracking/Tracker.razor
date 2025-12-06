@@ -1,8 +1,12 @@
 ﻿@using Application.Shared.Models
+@using BudgetTracking = Application.Features.BudgetTracking
 @using Components.BudgetTracking.Models
 @using Components.Shared
+@using Microsoft.Extensions.Logging
 @page "/budget-tracker"
 @inherits StatefulComponent
+@inject BudgetTracking.GetTransaction.Handler GetTransactionHandler
+@inject ILogger<Tracker> Logger
 
 <TransactionGrid Data="@data" />
 
@@ -14,48 +18,15 @@
 		await base.OnInitializedAsync();
 
 		// initialize
-		data =
-		[
-			new(){
-				Date = new DateTime(2025, 11, 14),
-				BudgetType = BudgetType.Expenses,
-				BudgetCategory = new(1, "Household"),
-				Amount = 200.00m,
-				Account = "Cash",
-				Description = "Broadband bill"
-		},
-			new(){
-				Date = new DateTime(2025, 11, 13),
-				BudgetType = BudgetType.Savings,
-				BudgetCategory = new(2, "Emergency fund"),
-				Amount = 500.00m,
-				Account = "Salary A/c",
-				Description = "Emergency fund"
-		},
-			new(){
-				Date = new DateTime(2025, 11, 12),
-				BudgetType = BudgetType.Expenses,
-				BudgetCategory = new(3, "Household"),
-				Amount = 500.00m,
-				Account = "Salary A/c",
-				Description = "Utility bill"
-		},
-			new(){
-				Date = new DateTime(2025, 11, 12),
-				BudgetType = BudgetType.Expenses,
-				BudgetCategory = new(4, "Household"),
-				Amount = 500.00m,
-				Account = "Salary A/c",
-				Description = "Grocery bill"
-		},
-			new(){
-				Date = new DateTime(2025, 11, 10),
-				BudgetType = BudgetType.Income,
-				BudgetCategory = new(5, "Salary"),
-				Amount = 5000.00m,
-				Account = "Salary A/c",
-				Description = "Salary of Nov 25"
+		var result = await GetTransactionHandler.DoAsync(new(State.Year.ToString(), DateTime.Now.Month.ToString()))
+						.ConfigureAwait(false);
+		if (result.IsFailure)
+		{
+			if (Logger.IsEnabled(LogLevel.Error))
+				Logger.LogError("Failed to fetch transactions of {Year} and {Month}: {Error}", State.Year, DateTime.Now.Month, result.Error);
+			Notifier.Notify(Radzen.NotificationSeverity.Error, NotificationMessages.TransactionFetchFailed);
+			return;
 		}
-		];
+		data = [.. result.Value.Select(p => p.ToTransaction())];
 	}
 }
