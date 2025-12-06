@@ -1,24 +1,23 @@
-﻿@using Application.Shared.Models
-@using BudgetTracking = Application.Features.BudgetTracking
-@using Components.BudgetTracking.Models
+﻿@using Application.Schema.BudgetTracking.Models
 @using Components.Shared
 @using Microsoft.Extensions.Logging
 @page "/budget-tracker"
 @inherits StatefulComponent
-@inject BudgetTracking.GetTransaction.Handler GetTransactionHandler
+@inject AppBudgetTracking.GetTransaction.IHandler GetTransactionHandler
 @inject ILogger<Tracker> Logger
 
-<TransactionGrid Data="@data" />
+<TransactionGrid Data="@data" CurrentMonth="@CurrentMonth" />
 
 @code {
-	List<Transaction> data = [];
+	List<TransactionInfo> data = [];
+	int CurrentMonth => DateTime.Now.Month;
 
 	protected override async Task OnInitializedAsync()
 	{
 		await base.OnInitializedAsync();
 
 		// initialize
-		var result = await GetTransactionHandler.DoAsync(new(State.Year.ToString(), DateTime.Now.Month.ToString()))
+		var result = await GetTransactionHandler.DoAsync(new(State.Year.ToString(), CurrentMonth.ToString()))
 						.ConfigureAwait(false);
 		if (result.IsFailure)
 		{
@@ -27,6 +26,6 @@
 			Notifier.Notify(Radzen.NotificationSeverity.Error, NotificationMessages.TransactionFetchFailed);
 			return;
 		}
-		data = [.. result.Value.Select(p => p.ToTransaction())];
+		data = result.Value;
 	}
 }

@@ -1,4 +1,5 @@
-﻿using Application.Shared.Models;
+﻿using Application.Schema.BudgetPlanning.Models;
+using Application.Schema.Shared.Models;
 using Components.Shared.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
@@ -10,44 +11,44 @@ namespace Components.BudgetPlanning;
 public partial class BudgetGrid
 {
     [Parameter]
-    public BudgetType Type { get; set; } = BudgetType.Summary;
+    public BudgetItemType Type { get; set; } = BudgetItemType.Summary;
     [Parameter]
-    public List<Models.Budget> Data { get; set; } = [];
+    public List<BudgetInfo> Data { get; set; } = [];
     [Parameter]
-    public EventCallback<List<Models.Budget>> DataChanged { get; set; }
+    public EventCallback<List<BudgetInfo>> DataChanged { get; set; }
     [Parameter]
     public EventCallback RecalculateBudgetSummary { get; set; }
 
-    RadzenDataGrid<Models.Budget>? grid;
-    List<Category> categories = [];
+    RadzenDataGrid<BudgetInfo>? grid;
+    List<BudgetItem> budgetItems = [];
     string FirstColumnHeader => Type switch
     {
-        BudgetType.Summary => string.Empty,
+        BudgetItemType.Summary => string.Empty,
         _ => Type.ToString()
     };
     GridOperation operation = GridOperation.None;
-    string selectedCategoryDesc = string.Empty;
+    string selectedBudgetItemDesc = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
 
-        if (Type is not BudgetType.Summary)
+        if (Type is BudgetItemType.Summary)
+            return;
+
+        var getterResult = await GetBudgetItemHandler.DoAsync(new(Type));
+        if (getterResult.IsFailure)
         {
-            var getterResult = await GetCategoryDescriptionHandler.DoAsync(new(Type));
-            if (getterResult.IsFailure)
-            {
-                Logger.LogError("Failed to get category descriptions for budget type {Type}: {Error}", Type, getterResult.Error);
-                return;
-            }
-            categories = getterResult.Value;
+            Logger.LogError("Failed to get category descriptions for budget type {Type}: {Error}", Type, getterResult.Error);
+            return;
         }
+        budgetItems = getterResult.Value;
     }
 
     void Reset()
     {
         operation = GridOperation.None;
-        selectedCategoryDesc = string.Empty;
+        selectedBudgetItemDesc = string.Empty;
     }
 
     async Task OnAddRowAsync()
@@ -59,14 +60,14 @@ public partial class BudgetGrid
         }
 
         operation = GridOperation.Create;
-        selectedCategoryDesc = string.Empty;
+        selectedBudgetItemDesc = string.Empty;
         await grid.InsertRow(new()
         {
-            CategoryId = -1
+            BudgetItemId = -1
         });
     }
 
-    async Task OnEditRowAsync(Models.Budget budget)
+    async Task OnEditRowAsync(BudgetInfo budget)
     {
         if (grid == null || !grid.IsValid || operation is not GridOperation.None)
         {
@@ -75,11 +76,11 @@ public partial class BudgetGrid
         }
 
         operation = GridOperation.Update;
-        selectedCategoryDesc = budget.CategoryDesc;
+        selectedBudgetItemDesc = budget.BudgetItemDesc;
         await grid.EditRow(budget);
     }
 
-    async Task OnSaveRowAsync(Models.Budget budget)
+    async Task OnSaveRowAsync(BudgetInfo budget)
     {
         if (grid == null || !grid.IsValid)
             return;
@@ -90,37 +91,37 @@ public partial class BudgetGrid
             case GridOperation.Create:
                 {
                     // validate
-                    if (Data.Exists(p => p.CategoryDesc == selectedCategoryDesc))
+                    if (Data.Exists(p => p.BudgetItemDesc == selectedBudgetItemDesc))
                     {
                         Notifier.Notify(NotificationSeverity.Error, NotificationMessages.BudgetCategoryAlreadyExists);
                         return;
                     }
 
                     // update
-                    var selectedCategory = categories.Find(p => p.Description == selectedCategoryDesc);
+                    var selectedCategory = budgetItems.Find(p => p.Description == selectedBudgetItemDesc);
                     if (selectedCategory == null)
                     {
-                        budget.CategoryId = -1;
-                        budget.CategoryDesc = selectedCategoryDesc;
+                        budget.BudgetItemId = -1;
+                        budget.BudgetItemDesc = selectedBudgetItemDesc;
                     }
                     else
                     {
-                        budget.CategoryId = selectedCategory.Id;
-                        budget.CategoryDesc = selectedCategory.Description;
+                        budget.BudgetItemId = selectedCategory.Id;
+                        budget.BudgetItemDesc = selectedCategory.Description;
                     }
                     break;
                 }
             case GridOperation.Update:
                 {
                     // validate
-                    if (Data.Exists(p => p.CategoryId != budget.CategoryId && p.CategoryDesc == selectedCategoryDesc))
+                    if (Data.Exists(p => p.BudgetItemId != budget.BudgetItemId && p.BudgetItemDesc == selectedBudgetItemDesc))
                     {
                         Notifier.Notify(NotificationSeverity.Error, NotificationMessages.BudgetCategoryAlreadyExists);
                         return;
                     }
 
                     // update
-                    budget.CategoryDesc = selectedCategoryDesc;
+                    budget.BudgetItemDesc = selectedBudgetItemDesc;
                     break;
                 }
             default:
@@ -136,7 +137,7 @@ public partial class BudgetGrid
         Reset();
     }
 
-    async Task OnCancelEditAsync(Models.Budget budget)
+    async Task OnCancelEditAsync(BudgetInfo budget)
     {
         if (grid == null)
             return;
@@ -146,12 +147,12 @@ public partial class BudgetGrid
         Reset();
     }
 
-    async Task OnCreateAsync(Models.Budget budget)
+    async Task OnCreateAsync(BudgetInfo budget)
     {
         if (operation is not GridOperation.Create)
             return;
 
-        var annualBudget = budget.ToAnnualBudget();
+        var annualBudget = budget.ToBudget();
         var result = await CreateBudgetHandler.DoAsync(new(State.Year, Type, annualBudget)).ConfigureAwait(false);
         if (result.IsFailure)
         {
@@ -160,22 +161,22 @@ public partial class BudgetGrid
         }
         else
         {
-            if (budget.CategoryId == -1)
-                budget.CategoryId = result.Value;
+            if (budget.BudgetItemId == -1)
+                budget.BudgetItemId = result.Value;
             Data.Add(budget);
-            Models.Budget.RecalculateTotal(Data);
+            BudgetInfo.RecalculateTotal(Data);
             await RecalculateBudgetSummary.InvokeAsync();
             Notifier.Notify(NotificationSeverity.Success, NotificationMessages.BudgetCreationSuccess);
         }
         Reset();
     }
 
-    async Task OnUpdateAsync(Models.Budget budget)
+    async Task OnUpdateAsync(BudgetInfo budget)
     {
         if (operation is not GridOperation.Update)
             return;
 
-        var annualBudget = budget.ToAnnualBudget();
+        var annualBudget = budget.ToBudget();
         var result = await UpdateBudgetHandler.DoAsync(new(State.Year, annualBudget)).ConfigureAwait(false);
         if (result.IsFailure)
         {
@@ -185,29 +186,29 @@ public partial class BudgetGrid
         }
         else
         {
-            Data.RemoveAll(p => p.CategoryId == budget.CategoryId);
+            Data.RemoveAll(p => p.BudgetItemId == budget.BudgetItemId);
             Data.Add(budget);
-            Models.Budget.RecalculateTotal(Data);
+            BudgetInfo.RecalculateTotal(Data);
             await RecalculateBudgetSummary.InvokeAsync();
             Notifier.Notify(NotificationSeverity.Success, NotificationMessages.BudgetUpdationSuccess);
         }
         Reset();
     }
 
-    async Task OnDeleteAsync(Models.Budget budget)
+    async Task OnDeleteAsync(BudgetInfo budget)
     {
         if (grid == null)
             return;
 
         var confirm = await DlgSvc.Confirm(
             "Are you sure?",
-            $"Delete budget for {budget.CategoryDesc}",
+            $"Delete budget for {budget.BudgetItemDesc}",
             new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" })
             .ConfigureAwait(false);
         if (confirm.HasValue && !confirm.Value)
             return;
 
-        var result = await DeleteBudgetHandler.DoAsync(new(State.Year, budget.CategoryId)).ConfigureAwait(false);
+        var result = await DeleteBudgetHandler.DoAsync(new(State.Year, budget.BudgetItemId)).ConfigureAwait(false);
         if (result.IsFailure)
         {
             Logger.LogError("Failed to delete budget: {Error}", result.Error);
@@ -217,7 +218,7 @@ public partial class BudgetGrid
         else
         {
             Data.Remove(budget);
-            Models.Budget.RecalculateTotal(Data);
+            BudgetInfo.RecalculateTotal(Data);
             // TODO needed to be fixed
             await RecalculateBudgetSummary.InvokeAsync().ConfigureAwait(false);
             Notifier.Notify(NotificationSeverity.Success, NotificationMessages.BudgetDeletionSuccess);

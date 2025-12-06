@@ -1,10 +1,9 @@
-﻿@using Application.Features.BudgetTracking.GetCategory
-@using Application.Shared.Models
-@using Components.BudgetTracking.Models
+﻿@using Application.Schema.BudgetTracking.Models
 @using Components.Shared
 @using Microsoft.Extensions.Logging
 @inherits StatefulComponent
-@inject GetCategoryHandler GetCategoryHandler
+@inject AppBudgetTracking.GetBudget.IHandler GetBudgetHandler
+@inject AppBudgetTracking.CreateTransaction.IHandler CreateTransactionHandler
 @inject ILogger<TransactionGrid> Logger
 
 <RadzenDataGrid @ref="@grid"
@@ -15,7 +14,7 @@
 				Density="Density.Compact"
 				RowCreate="@OnCreateAsync"
 				RowUpdate="@OnUpdateAsync"
-				TItem="Transaction"
+				TItem="TransactionInfo"
 				Data="@Data">
 	<Columns>
 		<RadzenDataGridColumn Width="25px"
@@ -34,7 +33,7 @@
 							  Title="Budget Type"
 							  TextAlign="TextAlign.Left">
 			<EditTemplate Context="data">
-				<RadzenDropDown @bind-Value="@data.BudgetType" Data="@budgetTypes" Change="async (args) => await OnBudgetTypeChangedAsync(args)" />
+				<RadzenDropDown @bind-Value="@data.BudgetType" Data="@budgetItemTypes" Change="async (args) => await OnBudgetItemTypeChangedAsync(args)" />
 			</EditTemplate>
 		</RadzenDataGridColumn>
 		<RadzenDataGridColumn Width="25px"
@@ -42,8 +41,8 @@
 							  Title="Budget Category"
 							  TextAlign="TextAlign.Left">
 			<EditTemplate Context="data">
-				<RadzenDropDown @bind-Value="@selectedCategoryId"
-								Data="@categories"
+				<RadzenDropDown @bind-Value="@selectedBudgetId"
+								Data="@budgets"
 								TextProperty="Description"
 								ValueProperty="Id" />
 			</EditTemplate>

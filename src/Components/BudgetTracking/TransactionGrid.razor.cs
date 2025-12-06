@@ -1,24 +1,26 @@
-using Application.Shared;
-using Application.Shared.Models;
-using Components.BudgetTracking.Models;
 using Components.Shared.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 using Radzen;
 using Radzen.Blazor;
+using Application.Schema.Shared;
+using Application.Schema.Shared.Models;
+using Application.Schema.BudgetTracking.Models;
 
 namespace Components.BudgetTracking;
 
 public partial class TransactionGrid
 {
     [Parameter]
-    public List<Transaction> Data { get; set; } = [];
+    public List<TransactionInfo> Data { get; set; } = [];
+    [Parameter]
+    public int CurrentMonth { get; set; } = DateTime.Now.Month;
 
-    RadzenDataGrid<Transaction>? grid;
-    readonly BudgetType[] budgetTypes = [BudgetType.Income, BudgetType.Expenses, BudgetType.Savings];
-    List<Category> categories = [];
-    Dictionary<BudgetType, List<Category>> categoriesByType = [];
-    int selectedCategoryId;
+    RadzenDataGrid<TransactionInfo>? grid;
+    readonly BudgetItemType[] budgetItemTypes = [BudgetItemType.Income, BudgetItemType.Expenses, BudgetItemType.Savings];
+    readonly List<Budget> budgets = [];
+    Dictionary<BudgetItemType, List<Budget>> budgetsByType = [];
+    string selectedBudgetId = string.Empty;
     GridOperation operation = GridOperation.None;
 
     protected async override Task OnInitializedAsync()
@@ -26,11 +28,11 @@ public partial class TransactionGrid
         await base.OnInitializedAsync();
 
         // initialize categories for the selected year
-        List<Task<Result<List<Category>>>> getters =
+        List<Task<Result<List<Budget>>>> getters =
         [
-            GetCategoryHandler.DoAsync(new(BudgetType.Income, State.Year)),
-            GetCategoryHandler.DoAsync(new(BudgetType.Expenses, State.Year)),
-            GetCategoryHandler.DoAsync(new(BudgetType.Savings, State.Year))
+            GetBudgetHandler.DoAsync(new(BudgetItemType.Income, State.Year, CurrentMonth)),
+            GetBudgetHandler.DoAsync(new(BudgetItemType.Expenses, State.Year, CurrentMonth)),
+            GetBudgetHandler.DoAsync(new(BudgetItemType.Savings, State.Year, CurrentMonth))
         ];
         await Task.WhenAll(getters).ConfigureAwait(false);
         if (getters.Exists(p => p.Result.IsFailure))
@@ -48,25 +50,32 @@ public partial class TransactionGrid
             Notifier.Notify(NotificationSeverity.Error, NotificationMessages.CategoryFetchFailed);
             return;
         }
-        categoriesByType = new()
+        budgetsByType = new()
         {
-            [BudgetType.Income] = getters[0].Result.Value,
-            [BudgetType.Expenses] = getters[1].Result.Value,
-            [BudgetType.Savings] = getters[2].Result.Value
+            [BudgetItemType.Income] = getters[0].Result.Value,
+            [BudgetItemType.Expenses] = getters[1].Result.Value,
+            [BudgetItemType.Savings] = getters[2].Result.Value
         };
     }
 
-    async Task OnBudgetTypeChangedAsync(object arg)
+    void SetBudgetOptions(BudgetItemType type)
     {
-        if (arg is not BudgetType type)
+        var values = budgetsByType.GetValueOrDefault(type, []);
+        budgets.Clear();
+        budgets.AddRange(values);
+    }
+
+    async Task OnBudgetItemTypeChangedAsync(object arg)
+    {
+        if (arg is not BudgetItemType type)
             return;
-        categories = categoriesByType.GetValueOrDefault(type, []);
+        SetBudgetOptions(type);
     }
 
     void Reset()
     {
         operation = GridOperation.None;
-        selectedCategoryId = -1;
+        selectedBudgetId = string.Empty;
     }
 
     async Task OnAddRowAsync()
@@ -78,14 +87,16 @@ public partial class TransactionGrid
         }
 
         operation = GridOperation.Create;
-        selectedCategoryId = -1;
-        await grid.InsertRow(new()
+        TransactionInfo transaction = new()
         {
             Date = DateTime.Now
-        });
+        };
+        SetBudgetOptions(transaction.BudgetType);
+        selectedBudgetId = string.Empty;
+        await grid.InsertRow(transaction);
     }
 
-    async Task OnEditRowAsync(Transaction transaction)
+    async Task OnEditRowAsync(TransactionInfo transaction)
     {
         // TODO notification should be more specific
         if (grid == null || !grid.IsValid || operation is not GridOperation.None)
@@ -95,22 +106,38 @@ public partial class TransactionGrid
         }
 
         operation = GridOperation.Update;
-        selectedCategoryId = transaction.BudgetCategory.Id;
+        selectedBudgetId = transaction.Budget.Id;
         await grid.EditRow(transaction);
     }
 
-    async Task OnSaveRowAsync(Transaction transaction)
+    async Task OnSaveRowAsync(TransactionInfo transaction)
     {
         // TODO add notification 
         if (grid == null || !grid.IsValid)
             return;
+
+        // set category
+        var selectedBudget = budgets.FirstOrDefault(c => c.Id == selectedBudgetId);
+        if (selectedBudget == null)
+        {
+            Notifier.Notify(NotificationSeverity.Error, NotificationMessages.TransactionCategoryNotSelected);
+            return;
+        }
+        else
+            transaction.Budget = selectedBudget;
+
+        // set effective date
+        if (transaction.BudgetType is BudgetItemType.Income &&
+            State.ShiftLateIncomeStatus &&
+            transaction.Date.Day >= State.ShiftLateIncomeStartingDay)
+            transaction.EffectiveDate = new DateTime(transaction.Date.Year, transaction.Date.Month, 1).AddMonths(1);
 
         // save changes
         await grid.UpdateRow(transaction);
         Reset();
     }
 
-    async Task OnCancelEditAsync(Transaction transaction)
+    async Task OnCancelEditAsync(TransactionInfo transaction)
     {
         if (grid == null)
             return;
@@ -119,17 +146,29 @@ public partial class TransactionGrid
         Reset();
     }
 
-    async Task OnCreateAsync(Transaction transaction)
+    async Task OnCreateAsync(TransactionInfo transaction)
     {
         if (operation is not GridOperation.Create)
             return;
 
-        Data.Add(transaction);
-        Notifier.Notify(NotificationSeverity.Success, NotificationMessages.TransactionCreationSuccess);
+        var creatable = transaction.ToTransaction();
+        var result = await CreateTransactionHandler.DoAsync(new(creatable)).ConfigureAwait(false);
+        if (result.IsFailure)
+        {
+            if (Logger.IsEnabled(LogLevel.Error))
+                Logger.LogError("Error creating transaction: {Error}", result.Error);
+            Notifier.Notify(NotificationSeverity.Error, NotificationMessages.TransactionCreationFailed);
+            return;
+        }
+        else
+        {
+            Data.Add(transaction);
+            Notifier.Notify(NotificationSeverity.Success, NotificationMessages.TransactionCreationSuccess);
+        }
         Reset();
     }
 
-    async Task OnUpdateAsync(Transaction transaction)
+    async Task OnUpdateAsync(TransactionInfo transaction)
     {
         if (operation is not GridOperation.Update)
             return;
@@ -140,7 +179,7 @@ public partial class TransactionGrid
         Reset();
     }
 
-    async Task OnDeleteAsync(Transaction transaction)
+    async Task OnDeleteAsync(TransactionInfo transaction)
     {
         if (grid == null)
             return;

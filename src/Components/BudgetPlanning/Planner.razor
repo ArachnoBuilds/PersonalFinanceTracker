@@ -1,25 +1,24 @@
-﻿@using Application.Features.BudgetPlanning.GetBudget
-@using Application.Shared.Models
+﻿@using Application.Schema.Shared.Models
 @using Components.Shared
 @using Microsoft.Extensions.Logging
 @page "/budget-planner"
 @inherits StatefulComponent
-@inject GetBudgetHandler GetBudgetHandler
+@inject AppBudgetPlanning.GetBudget.IHandler GetBudgetHandler
 @inject ILogger<Planner> Logger
 
 <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Normal" Wrap="FlexWrap.Wrap">
 	<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End">
 		<BudgetGrid Data="@summaries"
-					Type="BudgetType.Summary" />
+					Type="BudgetItemType.Summary" />
 	</RadzenStack>
 	<BudgetGrid @bind-Data="@incomes"
-				Type="BudgetType.Income"
+				Type="BudgetItemType.Income"
 				RecalculateBudgetSummary="@RecalculateSummary" />
 	<BudgetGrid @bind-Data="@expenses"
-				Type="BudgetType.Expenses"
+				Type="BudgetItemType.Expenses"
 				RecalculateBudgetSummary="@RecalculateSummary" />
 	<BudgetGrid @bind-Data="@savings"
-				Type="BudgetType.Savings"
+				Type="BudgetItemType.Savings"
 				RecalculateBudgetSummary="@RecalculateSummary" />
 </RadzenStack>
 

@@ -13,4 +13,5 @@ internal static class NotificationMessages
     public const string TransactionUpdateInitializationFailed = "Failed to initiate transaction updation.";
     public const string TransactionDeleteInitializationFailed = "Failed to initiate transaction deletion.";
     public const string CategoryFetchFailed = "Failed to fetch category data.";
+    public const string TransactionCategoryNotSelected = "Please select a category for the transaction.";
 }

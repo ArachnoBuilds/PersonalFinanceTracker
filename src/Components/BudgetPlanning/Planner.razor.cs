@@ -1,18 +1,18 @@
-using Application.Features.BudgetPlanning.Models;
-using Application.Shared;
-using Application.Shared.Models;
+using Application.Schema.BudgetPlanning.Models;
+using Application.Schema.Shared;
+using Application.Schema.Shared.Models;
 using Microsoft.Extensions.Logging;
 
 namespace Components.BudgetPlanning;
 
-using AnnualBudgetsResult = Result<List<AnnualBudget>>;
+using AnnualBudgetsResult = Result<List<Budget>>;
 
 public partial class Planner
 {
-    List<Models.Budget> summaries = [];
-    List<Models.Budget> incomes = [];
-    List<Models.Budget> expenses = [];
-    List<Models.Budget> savings = [];
+    List<BudgetInfo> summaries = [];
+    List<BudgetInfo> incomes = [];
+    List<BudgetInfo> expenses = [];
+    List<BudgetInfo> savings = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -28,10 +28,10 @@ public partial class Planner
     async Task PrepareBudgetsAsync(int selectedYear) 
     {
         // fetch budgets for the selected year
-        List<Task<AnnualBudgetsResult>> getters = [
-            GetBudgetHandler.DoAsync(new(selectedYear, BudgetType.Income)),
-            GetBudgetHandler.DoAsync(new(selectedYear, BudgetType.Expenses)),
-            GetBudgetHandler.DoAsync(new(selectedYear, BudgetType.Savings))
+        List<Task<Result<List<BudgetInfo>>>> getters = [
+            GetBudgetHandler.DoAsync(new(selectedYear, BudgetItemType.Income)),
+            GetBudgetHandler.DoAsync(new(selectedYear, BudgetItemType.Expenses)),
+            GetBudgetHandler.DoAsync(new(selectedYear, BudgetItemType.Savings))
         ];
         await Task.WhenAll(getters);
 
@@ -42,9 +42,8 @@ public partial class Planner
                 .FindAll(p => p.Result.IsFailure)
                 .ForEach(p =>
                 {
-                    // TODO check why Logger.IsEnabled is not behaving as expectation
-                    //if (!Logger.IsEnabled(LogLevel.Error))
-                    //    return;
+                    if (!Logger.IsEnabled(LogLevel.Error))
+                        return;
                     Logger.LogError("Error fetching budgets for year {Year}: {Error}",
                         selectedYear,
                         p.Result.Error);
@@ -53,10 +52,10 @@ public partial class Planner
             return;
         }
 
-        // map then set budgets
-        incomes = getters[0].Result.Value.ToBudget();
-        expenses = getters[1].Result.Value.ToBudget();
-        savings = getters[2].Result.Value.ToBudget();
+        // set budgets
+        incomes = getters[0].Result.Value;
+        expenses = getters[1].Result.Value;
+        savings = getters[2].Result.Value;
 
         // calculate summary
         RecalculateSummary();
@@ -67,10 +66,10 @@ public partial class Planner
     {
         summaries =
         [
-            Models.Budget.ToSummaryBudget(
-                incomes.Find(p => p.IsTotalCategory) ?? Models.Budget.EmptyTotal,
-                expenses.Find(p => p.IsTotalCategory) ??  Models.Budget.EmptyTotal,
-                savings.Find(p => p.IsTotalCategory) ?? Models.Budget.EmptyTotal)
+            BudgetInfo.ToSummaryBudget(
+                incomes.Find(p => p.IsTotalCategory) ?? BudgetInfo.EmptyTotal,
+                expenses.Find(p => p.IsTotalCategory) ??  BudgetInfo.EmptyTotal,
+                savings.Find(p => p.IsTotalCategory) ?? BudgetInfo.EmptyTotal)
         ];
     }
 }

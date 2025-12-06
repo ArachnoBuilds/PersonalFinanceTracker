@@ -1,16 +1,13 @@
-﻿@using Application.Features.BudgetPlanning.CreateBudget
-@using Application.Features.BudgetPlanning.DeleteBudget
-@using Application.Features.BudgetPlanning.GetCategory
-@using Application.Features.BudgetPlanning.UpdateBudget
-@using Application.Shared.Models
+﻿@using Application.Schema.BudgetPlanning.Models
+@using Application.Schema.Shared.Models
 @using Components.Shared
 @using Components.Shared.Models
 @using Microsoft.Extensions.Logging
 @inherits StatefulComponent
-@inject GetCategoryHandler GetCategoryDescriptionHandler
-@inject CreateBudgetHandler CreateBudgetHandler
-@inject UpdateBudgetHandler UpdateBudgetHandler
-@inject DeleteBudgetHandler DeleteBudgetHandler
+@inject AppBudgetPlanning.GetBudgetItem.IHandler GetBudgetItemHandler
+@inject AppBudgetPlanning.CreateBudget.IHandler CreateBudgetHandler
+@inject AppBudgetPlanning.UpdateBudget.IHandler UpdateBudgetHandler
+@inject AppBudgetPlanning.DeleteBudget.IHandler DeleteBudgetHandler
 @inject ILogger<BudgetGrid> Logger
 
 <RadzenDataGrid @ref="@grid"
@@ -21,11 +18,11 @@
 				Density="Density.Compact"
 				RowCreate="@OnCreateAsync"
 				RowUpdate="@OnUpdateAsync"
-				TItem="Models.Budget"
+				TItem="BudgetInfo"
 				Data="@Data"
-				Style="@($"overflow:scroll{(Type is not BudgetType.Summary ? "; max-height: 24vh" : "; width: 75vw")}")">
+				Style="@($"overflow:scroll{(Type is not BudgetItemType.Summary ? "; max-height: 24vh" : "; width: 75vw")}")">
 	<Columns>
-		@if (Type != BudgetType.Summary)
+		@if (Type != BudgetItemType.Summary)
 		{
 			<RadzenDataGridColumn Width="100px"
 								  Filterable="false"
@@ -41,7 +38,7 @@
 				<Template Context="data">
 					<RadzenText TextStyle="TextStyle.Body1">
 						<strong>
-							@data.CategoryDesc
+							@data.BudgetItemDesc
 						</strong>
 					</RadzenText>
 				</Template>
@@ -50,16 +47,16 @@
 					{
 						case GridOperation.Create:
 							<RadzenAutoComplete Name="Category"
-												Data="@categories"
+												Data="@budgetItems"
 												TextProperty="Description"
-												@bind-Value="@selectedCategoryDesc"
+												@bind-Value="@selectedBudgetItemDesc"
 												FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
 												FilterOperator="StringFilterOperator.Contains"
 												Style="width: 100%" />
 							break;
 						case GridOperation.Update:
 							<RadzenTextBox Name="Category"
-										   @bind-Value="@selectedCategoryDesc"
+										   @bind-Value="@selectedBudgetItemDesc"
 										   Style="width:100%" />
 							break;
 					}
@@ -247,7 +244,7 @@
 				@Render(data.Total, true)
 			</Template>
 		</RadzenDataGridColumn>
-		@if (Type != BudgetType.Summary)
+		@if (Type != BudgetItemType.Summary)
 		{
 			<RadzenDataGridColumn Width="75px"
 								  Filterable="false"
@@ -279,7 +276,7 @@
 		}
 		else
 		{
-			@Render(Type is BudgetType.Summary ? "✅" : " - ", isTotalCategory)
+			@Render(Type is BudgetItemType.Summary ? "✅" : " - ", isTotalCategory)
 		}
 	};
 	RenderFragment Render(string text, bool isTotal) => __builder =>

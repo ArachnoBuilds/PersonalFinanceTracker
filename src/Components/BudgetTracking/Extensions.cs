@@ -1,21 +1,18 @@
-﻿using BT = Application.Features.BudgetTracking;
+﻿using Application.Schema.BudgetTracking.Models;
 
 namespace Components.BudgetTracking;
 
 internal static class Extensions
 {
-    extension(BT.Models.Transaction transaction)
+    extension(TransactionInfo transaction)
     {
-        public Models.Transaction ToTransaction() => new()
-        {
-            Id = transaction.Id,
-            Date = transaction.Date,
-            BudgetType = transaction.BudgetInfo.Type,
-            BudgetCategory = transaction.BudgetInfo.Category,
-            Account = transaction.Account,
-            Amount = transaction.Amount,
-            Description = transaction.Description,
-            EffectiveDate = transaction.EffectiveDate
-        };
+        public Transaction ToTransaction() => new(
+            transaction.Id,
+            transaction.Date,
+            transaction.Budget.Id,
+            transaction.Account,
+            transaction.Amount,
+            transaction.Description,
+            transaction.EffectiveDate);
     }
 }
