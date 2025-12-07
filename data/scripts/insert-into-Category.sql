@@ -1,4 +1,4 @@
-﻿INSERT INTO Category VALUES
+INSERT INTO BudgetItem VALUES
 (1, "Income", "Salary"),
 (2, "Expenses", "Household"),
 (3, "Savings", "SIP"),
