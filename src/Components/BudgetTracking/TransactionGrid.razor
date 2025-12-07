@@ -3,7 +3,10 @@
 @using Microsoft.Extensions.Logging
 @inherits StatefulComponent
 @inject AppBudgetTracking.GetBudget.IHandler GetBudgetHandler
+@inject AppBudgetTracking.GetAccount.IHandler GetAccountHandler
 @inject AppBudgetTracking.CreateTransaction.IHandler CreateTransactionHandler
+@inject AppBudgetTracking.UpdateTransaction.IHandler UpdateTransactionHandler
+@inject AppBudgetTracking.DeleteTransaction.IHandler DeleteTransactionHandler
 @inject ILogger<TransactionGrid> Logger
 
 <RadzenDataGrid @ref="@grid"
@@ -37,13 +40,13 @@
 			</EditTemplate>
 		</RadzenDataGridColumn>
 		<RadzenDataGridColumn Width="25px"
-							  Property="BudgetCategory.Description"
+							  Property="Budget.BudgetItemDesc"
 							  Title="Budget Category"
 							  TextAlign="TextAlign.Left">
 			<EditTemplate Context="data">
 				<RadzenDropDown @bind-Value="@selectedBudgetId"
 								Data="@budgets"
-								TextProperty="Description"
+								TextProperty="BudgetItemDesc"
 								ValueProperty="Id" />
 			</EditTemplate>
 		</RadzenDataGridColumn>
@@ -57,6 +60,21 @@
 			<EditTemplate Context="data">
 				<RadzenNumeric Name="Amount" @bind-Value="@data.Amount" Min="0" ShowUpDown="false" Style="width:100%" />
 				<RadzenNumericRangeValidator Component="Amount" Min="0.00m" Text="Amount can't be less than zero" Popup="true" Style="display: block" />
+			</EditTemplate>
+		</RadzenDataGridColumn>
+		<RadzenDataGridColumn Width="25px"
+							  Property="Account"
+							  Title="Account"
+							  TextAlign="TextAlign.Right">
+			<EditTemplate Context="data">
+				<RadzenAutoComplete Name="Account"
+									Data="@accounts"
+									@bind-Value="@selectedAccount"
+									FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+									FilterOperator="StringFilterOperator.Contains"
+									Style="width: 100%" />
+				<RadzenRequiredValidator Component="Account" Text="@($"Account is required")" Popup="false" Style="display: block" />
+				<RadzenRegexValidator Component="Account" Text="@($"Account shouldn't conatin any special characters")" Pattern="[a-zA-Z\d ]*" Popup="false" Style="display: block" />
 			</EditTemplate>
 		</RadzenDataGridColumn>
 		<RadzenDataGridColumn Width="75px"

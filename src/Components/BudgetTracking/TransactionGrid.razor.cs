@@ -19,43 +19,63 @@ public partial class TransactionGrid
     RadzenDataGrid<TransactionInfo>? grid;
     readonly BudgetItemType[] budgetItemTypes = [BudgetItemType.Income, BudgetItemType.Expenses, BudgetItemType.Savings];
     readonly List<Budget> budgets = [];
+    readonly List<string> accounts = [];
     Dictionary<BudgetItemType, List<Budget>> budgetsByType = [];
     string selectedBudgetId = string.Empty;
+    string selectedAccount = string.Empty;
     GridOperation operation = GridOperation.None;
 
     protected async override Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+        await Task.WhenAll(
+            InitializeBudgetsAsync(),
+            InitializeAccountsAsync())
+            .ConfigureAwait(false);
 
-        // initialize categories for the selected year
-        List<Task<Result<List<Budget>>>> getters =
-        [
-            GetBudgetHandler.DoAsync(new(BudgetItemType.Income, State.Year, CurrentMonth)),
-            GetBudgetHandler.DoAsync(new(BudgetItemType.Expenses, State.Year, CurrentMonth)),
-            GetBudgetHandler.DoAsync(new(BudgetItemType.Savings, State.Year, CurrentMonth))
-        ];
-        await Task.WhenAll(getters).ConfigureAwait(false);
-        if (getters.Exists(p => p.Result.IsFailure))
+        async Task InitializeBudgetsAsync()
         {
-            getters
-                .FindAll(p => p.Result.IsFailure)
-                .ForEach(p =>
-                {
-                    if (!Logger.IsEnabled(LogLevel.Error))
-                        return;
-                    Logger.LogError("Error fetching budget categories for year {Year}: {Error}",
-                        State.Year,
-                        p.Result.Error);
-                });
-            Notifier.Notify(NotificationSeverity.Error, NotificationMessages.CategoryFetchFailed);
-            return;
+            List<Task<Result<List<Budget>>>> getters =
+            [
+                GetBudgetHandler.DoAsync(new(BudgetItemType.Income, State.Year, CurrentMonth)),
+                GetBudgetHandler.DoAsync(new(BudgetItemType.Expenses, State.Year, CurrentMonth)),
+                GetBudgetHandler.DoAsync(new(BudgetItemType.Savings, State.Year, CurrentMonth)),
+            ];
+            await Task.WhenAll(getters).ConfigureAwait(false);
+            if (getters.Exists(p => p.Result.IsFailure))
+            {
+                getters
+                    .FindAll(p => p.Result.IsFailure)
+                    .ForEach(p =>
+                    {
+                        if (!Logger.IsEnabled(LogLevel.Error))
+                            return;
+                        Logger.LogError("Error fetching budgets for year {Year}: {Error}",
+                            State.Year,
+                            p.Result.Error);
+                    });
+                Notifier.Notify(NotificationSeverity.Error, NotificationMessages.BudgetFetchFailed);
+                return;
+            }
+            budgetsByType = new()
+            {
+                [BudgetItemType.Income] = getters[0].Result.Value,
+                [BudgetItemType.Expenses] = getters[1].Result.Value,
+                [BudgetItemType.Savings] = getters[2].Result.Value
+            };
         }
-        budgetsByType = new()
+        async Task InitializeAccountsAsync()
         {
-            [BudgetItemType.Income] = getters[0].Result.Value,
-            [BudgetItemType.Expenses] = getters[1].Result.Value,
-            [BudgetItemType.Savings] = getters[2].Result.Value
-        };
+            var r = await GetAccountHandler.DoAsync().ConfigureAwait(false);
+            if (r.IsFailure)
+            {
+                if (Logger.IsEnabled(LogLevel.Error))
+                    Logger.LogError("Error fetching accounts: {Error}", r.Error);
+                Notifier.Notify(NotificationSeverity.Error, NotificationMessages.AccountFetchFailed);
+                return;
+            }
+            accounts.AddRange(r.Value);
+        }
     }
 
     void SetBudgetOptions(BudgetItemType type)
@@ -76,6 +96,7 @@ public partial class TransactionGrid
     {
         operation = GridOperation.None;
         selectedBudgetId = string.Empty;
+        selectedAccount = string.Empty;
     }
 
     async Task OnAddRowAsync()
@@ -93,6 +114,7 @@ public partial class TransactionGrid
         };
         SetBudgetOptions(transaction.BudgetType);
         selectedBudgetId = string.Empty;
+        selectedAccount = string.Empty;
         await grid.InsertRow(transaction);
     }
 
@@ -106,7 +128,9 @@ public partial class TransactionGrid
         }
 
         operation = GridOperation.Update;
+        SetBudgetOptions(transaction.BudgetType);
         selectedBudgetId = transaction.Budget.Id;
+        selectedAccount = transaction.Account;
         await grid.EditRow(transaction);
     }
 
@@ -120,17 +144,21 @@ public partial class TransactionGrid
         var selectedBudget = budgets.FirstOrDefault(c => c.Id == selectedBudgetId);
         if (selectedBudget == null)
         {
-            Notifier.Notify(NotificationSeverity.Error, NotificationMessages.TransactionCategoryNotSelected);
+            Notifier.Notify(NotificationSeverity.Error, NotificationMessages.BudgetNotSelected);
             return;
         }
         else
             transaction.Budget = selectedBudget;
 
+        // set account
+        transaction.Account = selectedAccount;
+
         // set effective date
-        if (transaction.BudgetType is BudgetItemType.Income &&
-            State.ShiftLateIncomeStatus &&
-            transaction.Date.Day >= State.ShiftLateIncomeStartingDay)
-            transaction.EffectiveDate = new DateTime(transaction.Date.Year, transaction.Date.Month, 1).AddMonths(1);
+        transaction.EffectiveDate = transaction.BudgetType is BudgetItemType.Income &&
+                                    State.ShiftLateIncomeStatus &&
+                                    transaction.Date.Day >= State.ShiftLateIncomeStartingDay
+                                    ? new DateTime(transaction.Date.Year, transaction.Date.Month, 1).AddMonths(1)
+                                    : transaction.Date;
 
         // save changes
         await grid.UpdateRow(transaction);
@@ -158,7 +186,6 @@ public partial class TransactionGrid
             if (Logger.IsEnabled(LogLevel.Error))
                 Logger.LogError("Error creating transaction: {Error}", result.Error);
             Notifier.Notify(NotificationSeverity.Error, NotificationMessages.TransactionCreationFailed);
-            return;
         }
         else
         {
@@ -172,10 +199,20 @@ public partial class TransactionGrid
     {
         if (operation is not GridOperation.Update)
             return;
-
-        Data.RemoveAll(p => p.Id == transaction.Id);
-        Data.Add(transaction);
-        Notifier.Notify(NotificationSeverity.Success, NotificationMessages.TransactionUpdationSuccess);
+        var updatable = transaction.ToTransaction();
+        var result = await UpdateTransactionHandler.DoAsync(new(updatable)).ConfigureAwait(false);
+        if (result.IsFailure)
+        {
+            if (Logger.IsEnabled(LogLevel.Error))
+                Logger.LogError("Error updating transaction: {Error}", result.Error);
+            Notifier.Notify(NotificationSeverity.Error, NotificationMessages.TransactionUpdationFailed);
+        }
+        else
+        {
+            Data.RemoveAll(p => p.Id == transaction.Id);
+            Data.Add(transaction);
+            Notifier.Notify(NotificationSeverity.Success, NotificationMessages.TransactionUpdationSuccess);
+        }
         Reset();
     }
 
@@ -192,9 +229,18 @@ public partial class TransactionGrid
         if (confirm.HasValue && !confirm.Value)
             return;
 
-        Data.Remove(transaction);
-        Notifier.Notify(NotificationSeverity.Success, NotificationMessages.TransactionDeletionSuccess);
-
+        var result = await DeleteTransactionHandler.DoAsync(new(transaction.Id)).ConfigureAwait(false);
+        if (result.IsFailure)
+        {
+            if (Logger.IsEnabled(LogLevel.Error))
+                Logger.LogError("Error deleting transaction: {Error}", result.Error);
+            Notifier.Notify(NotificationSeverity.Error, NotificationMessages.TransactionDeletionFailed);
+        }
+        else
+        {
+            Data.Remove(transaction);
+            Notifier.Notify(NotificationSeverity.Success, NotificationMessages.TransactionDeletionSuccess);
+        }
         await grid.Reload();
     }
 }
