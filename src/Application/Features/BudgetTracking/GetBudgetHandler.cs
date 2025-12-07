@@ -20,9 +20,9 @@ public class GetBudgetHandler(ASP.ApplicationDbContext context): IHandler
         {
             budgets = await context.Budgets
                             .AsNoTracking()
-                            .Include(p => p.Category)
-                            .Where(p => p.Category.Type == type && p.Year == year && p.Month == month)
-                            .Select(p => new BTM.Budget(p.Id, p.Category.Description))
+                            .Include(p => p.BudgetItem)
+                            .Where(p => p.BudgetItem.Type == type && p.Year == year && p.Month == month)
+                            .Select(p => new BTM.Budget(p.Id, p.BudgetItem.Description))
                             .ToListAsync(cancellation)
                             .ConfigureAwait(false);
         }

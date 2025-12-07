@@ -1,4 +1,4 @@
-﻿using Application.Shared.Persistence;
+﻿using ASP = Application.Shared.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Application.Schema.Shared;
 using Application.Schema.Shared.Models;
@@ -6,7 +6,7 @@ using Application.Schema.BudgetPlanning.GetBudgetItem;
 
 namespace Application.Features.BudgetPlanning;
 
-public class GetCategoryHandler(ApplicationDbContext context): IHandler
+public class GetBudgetItemHandler(ASP.ApplicationDbContext context): IHandler
 {
     public async Task<Result<List<BudgetItem>>> DoAsync(Query query, CancellationToken cancellation = default)
     {
@@ -17,7 +17,7 @@ public class GetCategoryHandler(ApplicationDbContext context): IHandler
         List<BudgetItem> budgetItems;
         try
         {
-            budgetItems = await context.Categories
+            budgetItems = await context.BudgetItems
                             .AsNoTracking()
                             .Where(p => p.Type == type)
                             .Select(p => new BudgetItem(p.Id, p.Description))

@@ -29,7 +29,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(
     options => options.UseSqlite(builder.Configuration.GetConnectionString("TrackerDb")));
 
 builder.Services.AddScoped<SBP.GetBudget.IHandler, BP.GetBudgetHandler>();
-builder.Services.AddScoped<SBP.GetBudgetItem.IHandler, BP.GetCategoryHandler>();
+builder.Services.AddScoped<SBP.GetBudgetItem.IHandler, BP.GetBudgetItemHandler>();
 builder.Services.AddScoped<SBP.CreateBudget.IHandler, BP.CreateBudgetHandler>();
 builder.Services.AddScoped<SBP.UpdateBudget.IHandler, BP.UpdateBudgetHandler>();
 builder.Services.AddScoped<SBP.DeleteBudget.IHandler, BP.DeleteBudgetHandler>();

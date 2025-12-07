@@ -9,15 +9,15 @@ public partial class Budget
 {
     public string Id { get; set; }
 
+    public int BudgetItemId { get; set; }
+
     public int Year { get; set; }
 
     public int Month { get; set; }
 
     public double Amount { get; set; }
 
-    public int CategoryId { get; set; }
-
-    public virtual Category Category { get; set; }
+    public virtual BudgetItem BudgetItem { get; set; }
 
     public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
 

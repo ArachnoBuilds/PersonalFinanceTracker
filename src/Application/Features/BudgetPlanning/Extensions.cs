@@ -8,7 +8,7 @@ internal static class Extensions
 {
     extension(Budget budget)
     {
-        public PM.Category ToCategory(BudgetItemType type, int? id = null) => new()
+        public PM.BudgetItem ToBudgetItem(BudgetItemType type, int? id = null) => new()
         {
             Id = id ?? budget.BudgetItemId,
             Description = budget.BudgetItemDesc,
@@ -28,7 +28,7 @@ internal static class Extensions
                     Year = year,
                     Month = (int)month,
                     Amount = (double)budget.MonthlyAmounts.GetValueOrDefault(month, 0),
-                    CategoryId = id ?? budget.BudgetItemId
+                    BudgetItemId = id ?? budget.BudgetItemId
                 });
             }
             return budgets;

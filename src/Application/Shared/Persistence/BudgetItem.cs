@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Application.Shared.Persistence;
 
-public partial class Category
+public partial class BudgetItem
 {
     public int Id { get; set; }
 

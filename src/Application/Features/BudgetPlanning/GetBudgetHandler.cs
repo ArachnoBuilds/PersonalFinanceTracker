@@ -20,7 +20,7 @@ public class GetBudgetHandler(ApplicationDbContext context): IHandler
         try
         {
             // fetch budgets from db
-            var budgets = await context.Categories
+            var budgets = await context.BudgetItems
                 .AsNoTracking()
                 .Include(p => p.Budgets.Where(b => b.Year == year))
                 .Where(p => p.Type == type && p.Budgets.Any())

@@ -12,11 +12,11 @@ public class UpdateBudgetHandler(ApplicationDbContext context): IHandler
     {
         try
         {
-            var budgetItem = context.Categories
+            var budgetItem = context.BudgetItems
                             .Include(p => p.Budgets.Where(b => b.Year == command.Year))
                             .FirstOrDefault(p => p.Id == command.Data.BudgetItemId);
             if (budgetItem == null)
-                return Errors.BudgetCategoryNotFound;
+                return Errors.BudgetItemNotFound;
 
             // update category description
             if (!budgetItem.Description.Equals(command.Data.BudgetItemDesc, StringComparison.InvariantCulture))

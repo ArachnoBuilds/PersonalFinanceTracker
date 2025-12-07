@@ -11,11 +11,11 @@ public class DeleteBudgetHandler(ApplicationDbContext context): IHandler
     {
         try
         {
-            var budgetItems = context.Categories
+            var budgetItems = context.BudgetItems
                             .Include(p => p.Budgets.Where(b => b.Year == command.Year))
                             .FirstOrDefault(p => p.Id == command.BudgetItemId);
             if (budgetItems == null)
-                return Errors.BudgetCategoryNotFound;
+                return Errors.BudgetItemNotFound;
 
             // remove budget entries for the specified year
             context.Budgets.RemoveRange(budgetItems.Budgets);

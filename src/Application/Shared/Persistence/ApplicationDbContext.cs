@@ -17,7 +17,7 @@ public partial class ApplicationDbContext : DbContext
 
     public virtual DbSet<Budget> Budgets { get; set; }
 
-    public virtual DbSet<Category> Categories { get; set; }
+    public virtual DbSet<BudgetItem> BudgetItems { get; set; }
 
     public virtual DbSet<Transaction> Transactions { get; set; }
 
@@ -36,10 +36,12 @@ public partial class ApplicationDbContext : DbContext
         {
             entity.ToTable("Budget");
 
-            entity.Property(e => e.CategoryId).HasColumnName("Category_Id");
+            entity.HasIndex(e => new { e.Year, e.Month, e.BudgetItemId }, "IX_Budget_Year_Month_BudgetItem_Id").IsUnique();
 
-            entity.HasOne(d => d.Category).WithMany(p => p.Budgets)
-                .HasForeignKey(d => d.CategoryId)
+            entity.Property(e => e.BudgetItemId).HasColumnName("BudgetItem_Id");
+
+            entity.HasOne(d => d.BudgetItem).WithMany(p => p.Budgets)
+                .HasForeignKey(d => d.BudgetItemId)
                 .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.YearNavigation).WithMany(p => p.Budgets)
@@ -47,9 +49,11 @@ public partial class ApplicationDbContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
-        modelBuilder.Entity<Category>(entity =>
+        modelBuilder.Entity<BudgetItem>(entity =>
         {
-            entity.ToTable("Category");
+            entity.ToTable("BudgetItem");
+
+            entity.HasIndex(e => e.Description, "IX_BudgetItem_Description").IsUnique();
 
             entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Description).IsRequired();

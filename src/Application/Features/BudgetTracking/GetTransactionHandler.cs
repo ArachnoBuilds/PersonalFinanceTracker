@@ -18,7 +18,7 @@ public class GetTransactionHandler(ApplicationDbContext context) : IHandler
             var data = await context.Transactions
                 .AsNoTracking()
                 .Include(p => p.Budget)
-                .ThenInclude(b => b.Category)
+                .ThenInclude(b => b.BudgetItem)
                 .Where(p =>
                     p.EffectiveDate.Substring(6, 4) == year &&
                     p.EffectiveDate.Substring(3, 2) == month)
@@ -35,7 +35,7 @@ public class GetTransactionHandler(ApplicationDbContext context) : IHandler
                     Date = DateTime.Parse(p.Date),
                     Budget = new(
                         p.Budget.Id,
-                        p.Budget.Category.Description),
+                        p.Budget.BudgetItem.Description),
                     Account = p.Account,
                     Amount = (decimal)p.Amount,
                     Description = p.Description,
