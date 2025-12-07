@@ -1,6 +1,7 @@
 ﻿using Application.Schema.BudgetTracking.GetTransaction;
 using Application.Schema.BudgetTracking.Models;
 using Application.Schema.Shared;
+using Application.Schema.Shared.Models;
 using Application.Shared.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,6 +34,7 @@ public class GetTransactionHandler(ApplicationDbContext context) : IHandler
                 {
                     Id = p.Id,
                     Date = DateTime.Parse(p.Date),
+                    BudgetType = Enum.Parse<BudgetItemType>(p.Budget.BudgetItem.Type),
                     Budget = new(
                         p.Budget.Id,
                         p.Budget.BudgetItem.Description),
