@@ -16,11 +16,11 @@ public class GetBudgetHandler(ApplicationDbContext context): IHandler
             return Errors.BudgetTypeSummaryNotAllowed;
 
         var (year, type) = (query.Year, query.Type.ToString());
-        List<BudgetInfo> returables = [];
+        List<BudgetInfo> budgets = [];
         try
         {
             // fetch budgets from db
-            var budgets = await context.BudgetItems
+            var data = await context.BudgetItems
                 .AsNoTracking()
                 .Include(p => p.Budgets.Where(b => b.Year == year))
                 .Where(p => p.Type == type && p.Budgets.Any())
@@ -32,8 +32,8 @@ public class GetBudgetHandler(ApplicationDbContext context): IHandler
                 .ConfigureAwait(false);
 
             // map to budgets
-            foreach (var p in budgets)
-                returables.Add(new()
+            foreach (var p in data)
+                budgets.Add(new()
                 {
                     BudgetItemId = p.BudgetItemId,
                     BudgetItemDesc = p.BudgetItemDesc,
@@ -50,11 +50,28 @@ public class GetBudgetHandler(ApplicationDbContext context): IHandler
                     Nov = (decimal)(p.Budgets.FirstOrDefault(b => b.Month == 11)?.Amount ?? 0),
                     Dec = (decimal)(p.Budgets.FirstOrDefault(b => b.Month == 12)?.Amount ?? 0)
                 });
+            budgets.Add(new()
+            {
+                BudgetItemId = -1,
+                BudgetItemDesc = "Total",
+                Jan = budgets.Sum(p => p.Jan),
+                Feb = budgets.Sum(p => p.Feb),
+                Mar = budgets.Sum(p => p.Mar),
+                Apr = budgets.Sum(p => p.Apr),
+                May = budgets.Sum(p => p.May),
+                Jun = budgets.Sum(p => p.Jun),
+                Jul = budgets.Sum(p => p.Jul),
+                Aug = budgets.Sum(p => p.Aug),
+                Sep = budgets.Sum(p => p.Sep),
+                Oct = budgets.Sum(p => p.Oct),
+                Nov = budgets.Sum(p => p.Nov),
+                Dec = budgets.Sum(p => p.Dec),
+            });
         }
         catch (Exception exc)
         {
             return Result.Failure<List<BudgetInfo>>(exc);
         }
-        return returables;
+        return budgets;
     }
 }
