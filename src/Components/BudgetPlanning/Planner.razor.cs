@@ -5,8 +5,6 @@ using Microsoft.Extensions.Logging;
 
 namespace Components.BudgetPlanning;
 
-using AnnualBudgetsResult = Result<List<Budget>>;
-
 public partial class Planner
 {
     List<BudgetInfo> summaries = [];
