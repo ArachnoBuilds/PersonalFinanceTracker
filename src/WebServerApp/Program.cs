@@ -36,7 +36,10 @@ builder.Services.AddScoped<SBP.DeleteBudget.IHandler, BP.DeleteBudgetHandler>();
 
 builder.Services.AddScoped<SBT.GetBudget.IHandler, BT.GetBudgetHandler>();
 builder.Services.AddScoped<SBT.GetTransaction.IHandler, BT.GetTransactionHandler>();
+builder.Services.AddScoped<SBT.GetAccount.IHandler, BT.GetAccountHandler>();
 builder.Services.AddScoped<SBT.CreateTransaction.IHandler, BT.CreateTransactionHandler>();
+builder.Services.AddScoped<SBT.UpdateTransaction.IHandler, BT.UpdateTransactionHandler>();
+builder.Services.AddScoped<SBT.DeleteTransaction.IHandler, BT.DeleteTransactionHandler>();
 
 var app = builder.Build();
 
