@@ -6,4 +6,13 @@
 @inject AppBudgetTracking.GetTransaction.IHandler GetTransactionHandler
 @inject ILogger<Tracker> Logger
 
-<TransactionGrid Data="@data" CurrentMonth="@CurrentMonth" />
+<RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Normal" Wrap="FlexWrap.Wrap">
+	<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End">
+		<RadzenDropDown @bind-Value="@selectedMonth" Data=@months Change="async () => await OnMonthChangedAsync()" >
+			<Template Context="data">
+				@data.ToString()
+			</Template>
+		</RadzenDropDown>
+	</RadzenStack>
+	<TransactionGrid Data="@data" CurrentMonth="@CurrentMonth" />
+</RadzenStack>

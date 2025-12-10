@@ -1,3 +1,4 @@
+using Application.Schema.BudgetPlanning.Models;
 using Application.Schema.BudgetTracking.Models;
 using Microsoft.Extensions.Logging;
 
@@ -6,7 +7,11 @@ namespace Components.BudgetTracking;
 public partial class Tracker
 {
     List<TransactionInfo> data = [];
-    int CurrentMonth => DateTime.Now.Month;
+    Month[] months = [];
+    Month selectedMonth = Month.Jan;
+
+    public int CurrentMonth => (int)selectedMonth;
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -15,14 +20,23 @@ public partial class Tracker
         AppStateManager.OnYearChangedAsync -= PrepareTransactionsAsync;
         AppStateManager.OnYearChangedAsync += PrepareTransactionsAsync;
 
+        // initialize months
+        months = Enum.GetValues<Month>();
+        selectedMonth = State.Month;
+
         // prepare transactions for the selected year
         await PrepareTransactionsAsync(State.Year);
     }
-    
+
+    async Task OnMonthChangedAsync() => 
+        await Task.WhenAll(
+            AppStateManager.SetMonthAsync(selectedMonth),
+            PrepareTransactionsAsync(State.Year))
+            .ConfigureAwait(false);
+
     async Task PrepareTransactionsAsync(int year)
     {
-        var result = await GetTransactionHandler.DoAsync(new(year.ToString(), CurrentMonth.ToString()))
-                        .ConfigureAwait(false);
+        var result = await GetTransactionHandler.DoAsync(new(year.ToString(), CurrentMonth.ToString())).ConfigureAwait(false);
         if (result.IsFailure)
         {
             if (Logger.IsEnabled(LogLevel.Error))

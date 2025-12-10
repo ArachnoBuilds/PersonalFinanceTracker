@@ -1,4 +1,5 @@
-﻿using Components.Shared.Models;
+﻿using Application.Schema.BudgetPlanning.Models;
+using Components.Shared.Models;
 
 namespace Components.Shared;
 
@@ -22,7 +23,7 @@ public class AppStateManager(ICacheService cacheSvc)
         var state = await cacheSvc.GetAsync<AppState>(AppStateCacheKey);
         if (state == null)
         {
-            state = new(true, DateTime.UtcNow.Year);
+            state = new(DateTime.UtcNow.Year);
             await cacheSvc.SetAsync(AppStateCacheKey, state);
         }
         State = state;
@@ -47,6 +48,16 @@ public class AppStateManager(ICacheService cacheSvc)
     {
         // update
         State = State with { LeftSidebarExpanded = expanded };
+
+        // persist
+        // TODO check if set happend correctly, take required actions if not
+        _ = await cacheSvc.SetAsync(AppStateCacheKey, State);
+    }
+
+    public async Task SetMonthAsync(Month month)
+    {
+        // update
+        State = State with { Month = month };
 
         // persist
         // TODO check if set happend correctly, take required actions if not
