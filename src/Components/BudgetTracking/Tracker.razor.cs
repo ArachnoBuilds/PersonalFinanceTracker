@@ -1,6 +1,9 @@
 using Application.Schema.BudgetPlanning.Models;
 using Application.Schema.BudgetTracking.Models;
+using Application.Schema.Shared;
+using Components.Shared;
 using Microsoft.Extensions.Logging;
+using GetTransactionCountQuery = Application.Schema.BudgetTracking.GetTransactionCount.Query;
 
 namespace Components.BudgetTracking;
 
@@ -9,34 +12,83 @@ public partial class Tracker
     List<TransactionInfo> data = [];
     Month[] months = [];
     Month selectedMonth = Month.Jan;
+    DateTime lastTransactionDate = DateTime.Today; // TODO fetch from backend
+    int totalTransactions = 0;
+    int totalTransactionsInCurrentYear = 0;
+    decimal trackedBalance = 0.00m; // TODO fetch from backend
+
+    string DaysSinceLastTransaction => totalTransactionsInCurrentYear > 0
+        ? $"({DateTime.Today.Subtract(lastTransactionDate).Days} days ago)"
+        : string.Empty;
+    string TotalTransactionsInCurrentYear => $"({totalTransactionsInCurrentYear} this year)";
+    string BalanceAnalysis => trackedBalance >= 0
+        ? "of tracked income left to be allocated"
+        : "allocated not covered by income";
 
     public int CurrentMonth => (int)selectedMonth;
-
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
 
-        AppStateManager.OnYearChangedAsync -= PrepareTransactionsAsync;
-        AppStateManager.OnYearChangedAsync += PrepareTransactionsAsync;
+        AppStateManager.OnYearChangedAsync -= GetTransactionsAsync;
+        AppStateManager.OnYearChangedAsync += GetTransactionsAsync;
 
         // initialize months
         months = Enum.GetValues<Month>();
         selectedMonth = State.Month;
 
-        // prepare transactions for the selected year
-        await PrepareTransactionsAsync(State.Year);
+        // initialize transaction counts
+        await GetTransactionCountsAsync();
+
+        // initialize last transaction date
+        await GetLastTransactionDateAsync();
+
+        // initialize transactions for the selected year
+        await GetTransactionsAsync(State.Year);
+
+        async Task GetTransactionCountsAsync()
+        {
+            var results = await Task.WhenAll(
+                GetTransactionCountHandler.DoAsync(),
+                GetTransactionCountHandler.DoAsync(new GetTransactionCountQuery(State.Year.ToString())))
+                .ConfigureAwait(false);
+            if (results[0].IsFailure || results[1].IsFailure)
+            {
+                if (Logger.IsEnabled(LogLevel.Error))
+                {
+                    var error = Error.Aggregate(results.Select(p => p.Error));
+                    Logger.LogError("Failed to fetch transaction count(s): {Error}", error);
+                }
+                Notifier.Notify(Radzen.NotificationSeverity.Error, NotificationMessages.TransactionMetaDataFetchFailed);
+                return;
+            }
+            totalTransactions = results[0].Value;
+            totalTransactionsInCurrentYear = results[1].Value;
+        }
+        async Task GetLastTransactionDateAsync()
+        {
+            var result = await GetLastTransactionDateHandler.DoAsync().ConfigureAwait(false);
+            if (result.IsFailure)
+            {
+                if (Logger.IsEnabled(LogLevel.Error))
+                    Logger.LogError("Failed to fetch last transaction date: {Error}", result.Error);
+                Notifier.Notify(Radzen.NotificationSeverity.Error, NotificationMessages.TransactionMetaDataFetchFailed);
+                return;
+            }
+            lastTransactionDate = result.Value;
+        }
     }
 
     async Task OnMonthChangedAsync() => 
         await Task.WhenAll(
             AppStateManager.SetMonthAsync(selectedMonth),
-            PrepareTransactionsAsync(State.Year))
+            GetTransactionsAsync(State.Year))
             .ConfigureAwait(false);
 
-    async Task PrepareTransactionsAsync(int year)
+    async Task GetTransactionsAsync(int year)
     {
-        var result = await GetTransactionHandler.DoAsync(new(year.ToString(), CurrentMonth.ToString())).ConfigureAwait(false);
+        var result = await GetTransactionHandler.DoAsync(new(year.ToString(), $"{CurrentMonth:00}")).ConfigureAwait(false);
         if (result.IsFailure)
         {
             if (Logger.IsEnabled(LogLevel.Error))

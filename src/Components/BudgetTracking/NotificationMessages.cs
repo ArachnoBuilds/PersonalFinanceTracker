@@ -5,6 +5,7 @@ internal static class NotificationMessages
     public const string TransactionCreationFailed = "Failed to create transaction entry.";
     public const string TransactionCreationSuccess = "Transaction entry created successfully.";
     public const string TransactionFetchFailed = "Failed to fetch transaction data.";
+    public const string TransactionMetaDataFetchFailed = "Failed to fetch transaction meta-data.";
     public const string TransactionUpdationFailed = "Failed to update transaction entry.";
     public const string TransactionUpdationSuccess = "Transaction entry updated successfully.";
     public const string TransactionDeletionFailed = "Failed to delete transaction entry.";

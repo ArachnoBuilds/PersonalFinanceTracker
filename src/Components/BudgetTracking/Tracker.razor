@@ -4,15 +4,48 @@
 @page "/budget-tracker"
 @inherits StatefulComponent
 @inject AppBudgetTracking.GetTransaction.IHandler GetTransactionHandler
+@inject AppBudgetTracking.GetTransactionCount.IHandler GetTransactionCountHandler
+@inject AppBudgetTracking.GetLastTransactionDate.IHandler GetLastTransactionDateHandler
 @inject ILogger<Tracker> Logger
 
 <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Normal" Wrap="FlexWrap.Wrap">
-	<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End">
-		<RadzenDropDown @bind-Value="@selectedMonth" Data=@months Change="async () => await OnMonthChangedAsync()" >
-			<Template Context="data">
-				@data.ToString()
-			</Template>
-		</RadzenDropDown>
-	</RadzenStack>
+	<RadzenCardGroup Responsive="true">
+		<RadzenCard Variant="Variant.Filled">
+			@RenderCardContent("Date of Today:", DateTime.Today.ToString("d"))
+		</RadzenCard>
+		<RadzenCard Variant="Variant.Filled">
+			@RenderCardContent("Date of Last Transaction:", $"{lastTransactionDate.ToString("d")} {DaysSinceLastTransaction}")
+		</RadzenCard>
+		<RadzenCard Variant="Variant.Filled">
+			@RenderCardContent("# Tracked Transaction(s):", $"{totalTransactions} {TotalTransactionsInCurrentYear}")
+		</RadzenCard>
+		<RadzenCard Variant="Variant.Filled">
+			@RenderCardContent("Total Tracked Balance:", $"{trackedBalance.ToCurrency()} {BalanceAnalysis}")
+		</RadzenCard>
+		<RadzenCard Variant="Variant.Filled">
+			<RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Normal" Wrap="FlexWrap.Wrap">
+				<RadzenText TextStyle="TextStyle.Body1">
+					<strong>Select Month:</strong>
+				</RadzenText>
+				<RadzenDropDown @bind-Value="@selectedMonth" Data=@months Change="async () => await OnMonthChangedAsync()">
+					<Template Context="data">
+						@data.ToString()
+					</Template>
+				</RadzenDropDown>
+			</RadzenStack>
+		</RadzenCard>
+	</RadzenCardGroup>
 	<TransactionGrid Data="@data" CurrentMonth="@CurrentMonth" />
 </RadzenStack>
+
+@code {
+	RenderFragment RenderCardContent(string title, string content) => __builder =>
+		{
+			<RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Normal" Wrap="FlexWrap.Wrap">
+				<RadzenText TextStyle="TextStyle.Body1">
+					<strong>@title</strong>
+				</RadzenText>
+				<RadzenText TextStyle="TextStyle.Body1" Text="@content" />
+			</RadzenStack>
+		};
+}
