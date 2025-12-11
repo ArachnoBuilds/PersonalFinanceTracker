@@ -99,6 +99,8 @@ public partial class TransactionGrid
         selectedAccount = string.Empty;
     }
 
+    void LoadData() => Data = [.. Data.OrderByDescending(p => p.EffectiveDate)];
+
     async Task OnAddRowAsync()
     {
         if (grid == null || !grid.IsValid || operation is not GridOperation.None)
@@ -162,6 +164,7 @@ public partial class TransactionGrid
 
         // save changes
         await grid.UpdateRow(transaction);
+        await grid.Reload();
         Reset();
     }
 
@@ -189,7 +192,10 @@ public partial class TransactionGrid
         }
         else
         {
-            Data.Add(transaction);
+            if (transaction.EffectiveDate.Month == CurrentMonth)
+                Data.Add(transaction);
+            else
+                Notifier.Notify(NotificationSeverity.Info, $"Please change the month to {transaction.EffectiveDate:MMMM} to view the transaction.", duration: 5000);
             Notifier.Notify(NotificationSeverity.Success, NotificationMessages.TransactionCreationSuccess);
         }
         Reset();
@@ -210,7 +216,10 @@ public partial class TransactionGrid
         else
         {
             Data.RemoveAll(p => p.Id == transaction.Id);
-            Data.Add(transaction);
+            if (transaction.EffectiveDate.Month == CurrentMonth)
+                Data.Add(transaction);
+            else
+                Notifier.Notify(NotificationSeverity.Info, $"Please change the month to {transaction.EffectiveDate:MMMM} to view the transaction.", duration: 5000);
             Notifier.Notify(NotificationSeverity.Success, NotificationMessages.TransactionUpdationSuccess);
         }
         Reset();

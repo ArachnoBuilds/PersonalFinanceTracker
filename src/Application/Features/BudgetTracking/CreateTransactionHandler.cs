@@ -23,11 +23,11 @@ public class CreateTransactionHandler(ApplicationDbContext context): IHandler
             context.Transactions.Add(new()
             {
                 Id = command.Data.Id,
-                Date = command.Data.Date.ToString("d"),
+                Date = command.Data.Date.ToString("o"),
                 BudgetId = command.Data.BudgetId,
                 Amount = (double)command.Data.Amount,
                 Description = command.Data.Description,
-                EffectiveDate = command.Data.EffectiveDate.ToString("d"),
+                EffectiveDate = command.Data.EffectiveDate.ToString("o"),
                 Account = command.Data.Account
             });
             

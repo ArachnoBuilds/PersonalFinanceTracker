@@ -21,9 +21,9 @@ public class GetTransactionHandler(ApplicationDbContext context) : IHandler
                 .Include(p => p.Budget)
                 .ThenInclude(b => b.BudgetItem)
                 .Where(p =>
-                    p.EffectiveDate.Substring(6, 4) == year &&
-                    p.EffectiveDate.Substring(3, 2) == month)
-                .OrderBy(p => p.Date)
+                    p.EffectiveDate.Substring(0, 4) == year &&
+                    p.EffectiveDate.Substring(5, 2) == month)
+                .OrderByDescending(p => p.Date)
                 .ToListAsync()
                 .ConfigureAwait(false);
 

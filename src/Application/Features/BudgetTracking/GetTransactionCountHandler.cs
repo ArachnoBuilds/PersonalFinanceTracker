@@ -27,7 +27,7 @@ public class GetTransactionCountHandler(ApplicationDbContext context) : IHandler
         try
         {
             count = await context.Transactions
-                .Where(p => p.Date.Substring(6, 4) == query.Year)
+                .Where(p => p.EffectiveDate.Substring(0, 4) == query.Year)
                 .CountAsync(cancellationToken)
                 .ConfigureAwait(false);
         }

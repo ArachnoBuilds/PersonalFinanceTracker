@@ -18,9 +18,10 @@
 				RowCreate="@OnCreateAsync"
 				RowUpdate="@OnUpdateAsync"
 				TItem="TransactionInfo"
+				LoadData="@LoadData"
 				Data="@Data">
 	<Columns>
-		<RadzenDataGridColumn Width="25px"
+		<RadzenDataGridColumn Width="30px"
 							  Property="Date"
 							  Title="Date"
 							  TextAlign="TextAlign.Left">
@@ -28,10 +29,10 @@
 				@data.Date.ToString("d")
 			</Template>
 			<EditTemplate Context="data">
-				<RadzenDatePicker @bind-Value="@data.Date" ShowCalendarWeek="true" />
+				<RadzenDatePicker @bind-Value="@data.Date" ShowCalendarWeek="true" DateFormat="dd-MM-yyyy" ShowButton="false"  />
 			</EditTemplate>
 		</RadzenDataGridColumn>
-		<RadzenDataGridColumn Width="25px"
+		<RadzenDataGridColumn Width="35px"
 							  Property="BudgetType"
 							  Title="Budget Type"
 							  TextAlign="TextAlign.Left">
@@ -39,7 +40,7 @@
 				<RadzenDropDown @bind-Value="@data.BudgetType" Data="@budgetItemTypes" Change="async (args) => await OnBudgetItemTypeChangedAsync(args)" />
 			</EditTemplate>
 		</RadzenDataGridColumn>
-		<RadzenDataGridColumn Width="25px"
+		<RadzenDataGridColumn Width="30px"
 							  Property="Budget.BudgetItemDesc"
 							  Title="Budget Category"
 							  TextAlign="TextAlign.Left">
@@ -50,7 +51,7 @@
 								ValueProperty="Id" />
 			</EditTemplate>
 		</RadzenDataGridColumn>
-		<RadzenDataGridColumn Width="25px"
+		<RadzenDataGridColumn Width="30px"
 							  Property="Amount"
 							  Title="Amount"
 							  TextAlign="TextAlign.Right">
@@ -62,10 +63,10 @@
 				<RadzenNumericRangeValidator Component="Amount" Min="0.00m" Text="Amount can't be less than zero" Popup="true" Style="display: block" />
 			</EditTemplate>
 		</RadzenDataGridColumn>
-		<RadzenDataGridColumn Width="25px"
+		<RadzenDataGridColumn Width="35px"
 							  Property="Account"
 							  Title="Account"
-							  TextAlign="TextAlign.Right">
+							  TextAlign="TextAlign.Left">
 			<EditTemplate Context="data">
 				<RadzenAutoComplete Name="Account"
 									Data="@accounts"
@@ -77,23 +78,30 @@
 				<RadzenRegexValidator Component="Account" Text="@($"Account shouldn't conatin any special characters")" Pattern="[a-zA-Z\d ]*" Popup="false" Style="display: block" />
 			</EditTemplate>
 		</RadzenDataGridColumn>
-		<RadzenDataGridColumn Width="75px"
+		<RadzenDataGridColumn Width="50px"
 							  Property="Description"
 							  Title="Description"
 							  TextAlign="TextAlign.Left">
 			<EditTemplate Context="data">
-				<RadzenTextArea @bind-Value="@data.Description" />
+				<RadzenTextArea @bind-Value="@data.Description" Cols="25" Rows="1" />
 			</EditTemplate>
 		</RadzenDataGridColumn>
-		<RadzenDataGridColumn Width="25px"
+		<RadzenDataGridColumn Width="30px"
 							  Property="EffectiveDate"
 							  Title="Effective Date"
-							  TextAlign="TextAlign.Left">
+							  TextAlign="TextAlign.Center">
 			<Template Context="data">
-				@data.EffectiveDate.ToString("d")
+				@if(data.Date == data.EffectiveDate)
+				{
+					@(" - ")
+				}
+				else
+				{
+					@data.EffectiveDate.ToString("d")
+				}
 			</Template>
 		</RadzenDataGridColumn>
-		<RadzenDataGridColumn Width="75px"
+		<RadzenDataGridColumn Width="50px"
 							  Filterable="false"
 							  Sortable="false"
 							  TextAlign="TextAlign.Right">

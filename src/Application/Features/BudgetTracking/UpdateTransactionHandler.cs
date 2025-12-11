@@ -26,11 +26,11 @@ public class UpdateTransactionHandler(ApplicationDbContext context) : IHandler
                     Value = command.Data.Account
                 });
 
-            transaction.Date = command.Data.Date.ToString("d");
+            transaction.Date = command.Data.Date.ToString("o");
             transaction.BudgetId = command.Data.BudgetId;
             transaction.Amount = (double)command.Data.Amount;
             transaction.Description = command.Data.Description;
-            transaction.EffectiveDate = command.Data.EffectiveDate.ToString("d");
+            transaction.EffectiveDate = command.Data.EffectiveDate.ToString("o");
             transaction.Account = command.Data.Account;
 
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

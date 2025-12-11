@@ -14,7 +14,7 @@ public class GetLastTransactionDateHandler(ApplicationDbContext context) : IHand
         {
             lastTransactionDate = await context.Transactions
                 .OrderByDescending(t => t.Date)
-                .Select(t => t.Date)
+                .Select(t => t.EffectiveDate)
                 .FirstOrDefaultAsync(cancellationToken)
                 .ConfigureAwait(false);
         }
