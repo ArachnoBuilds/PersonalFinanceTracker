@@ -3,7 +3,7 @@ using Application.Schema.Shared;
 
 namespace Application.Schema.BudgetTracking.GetTransaction;
 
-public record Query(string Year, string Month);
+public record Query(int Year, int Month);
 
 public interface IHandler
 {

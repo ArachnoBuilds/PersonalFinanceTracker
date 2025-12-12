@@ -77,7 +77,7 @@ public partial class Tracker
 
     async Task GetTransactionsAsync(int year)
     {
-        var result = await GetTransactionHandler.DoAsync(new(year.ToString(), $"{CurrentMonth:00}")).ConfigureAwait(false);
+        var result = await GetTransactionHandler.DoAsync(new(year, CurrentMonth)).ConfigureAwait(false);
         if (result.IsFailure)
         {
             if (Logger.IsEnabled(LogLevel.Error))

@@ -29,7 +29,7 @@
 				@data.Date.ToString("d")
 			</Template>
 			<EditTemplate Context="data">
-				<RadzenDatePicker @bind-Value="@data.Date" ShowCalendarWeek="true" DateFormat="dd-MM-yyyy" ShowButton="false"  />
+				<RadzenDatePicker @bind-Value="@data.Date" ShowCalendarWeek="true" DateFormat="dd-MM-yyyy" ShowButton="false" />
 			</EditTemplate>
 		</RadzenDataGridColumn>
 		<RadzenDataGridColumn Width="35px"
@@ -87,11 +87,19 @@
 			</EditTemplate>
 		</RadzenDataGridColumn>
 		<RadzenDataGridColumn Width="30px"
+							  Property="Balance"
+							  Title="Balance"
+							  TextAlign="TextAlign.Right">
+			<Template Context="data">
+				@data.Balance.ToCurrency()
+			</Template>
+		</RadzenDataGridColumn>
+		<RadzenDataGridColumn Width="30px"
 							  Property="EffectiveDate"
 							  Title="Effective Date"
 							  TextAlign="TextAlign.Center">
 			<Template Context="data">
-				@if(data.Date == data.EffectiveDate)
+				@if (data.Date == data.EffectiveDate)
 				{
 					@(" - ")
 				}
@@ -101,7 +109,7 @@
 				}
 			</Template>
 		</RadzenDataGridColumn>
-		<RadzenDataGridColumn Width="50px"
+		<RadzenDataGridColumn Width="25px"
 							  Filterable="false"
 							  Sortable="false"
 							  TextAlign="TextAlign.Right">
