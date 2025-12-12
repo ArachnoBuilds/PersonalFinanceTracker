@@ -18,7 +18,7 @@ public partial class Tracker
     int totalTransactionsInCurrentYear = 0;
     decimal trackedBalance = 0.00m; // TODO fetch from backend
 
-    string DaysSinceLastTransaction => totalTransactionsInCurrentYear > 0
+    string DaysSinceLastTransaction => DateTime.Today > lastTransactionDate
         ? $"({DateTime.Today.Subtract(lastTransactionDate).Days} days ago)"
         : string.Empty;
     string TotalTransactionsInCurrentYear => $"({totalTransactionsInCurrentYear} this year)";
