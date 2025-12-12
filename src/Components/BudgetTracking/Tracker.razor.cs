@@ -45,6 +45,9 @@ public partial class Tracker
         // initialize last transaction date
         await GetLastTransactionDateAsync();
 
+        // initialize last transaction balance
+        await GetLastTransactionBalanceAsync();
+
         // initialize transactions for the selected year
         await GetTransactionsAsync(State.Year);
 
@@ -66,6 +69,18 @@ public partial class Tracker
             }
             totalTransactions = results[0].Value;
             totalTransactionsInCurrentYear = results[1].Value;
+        }
+        async Task GetLastTransactionBalanceAsync()
+        {
+            var result = await GetLastTransactionBalanceHandler.DoAsync().ConfigureAwait(false);
+            if (result.IsFailure)
+            {
+                if (Logger.IsEnabled(LogLevel.Error))
+                    Logger.LogError("Failed to fetch last transaction balance: {Error}", result.Error);
+                Notifier.Notify(Radzen.NotificationSeverity.Error, NotificationMessages.TransactionMetaDataFetchFailed);
+                return;
+            }
+            trackedBalance = result.Value;
         }
     }
 

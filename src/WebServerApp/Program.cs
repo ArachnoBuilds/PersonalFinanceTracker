@@ -39,6 +39,7 @@ builder.Services.AddScoped<SBT.GetTransaction.IHandler, BT.GetTransactionHandler
 builder.Services.AddScoped<SBT.GetAccount.IHandler, BT.GetAccountHandler>();
 builder.Services.AddScoped<SBT.GetTransactionCount.IHandler, BT.GetTransactionCountHandler>();
 builder.Services.AddScoped<SBT.GetLastTransactionDate.IHandler, BT.GetLastTransactionDateHandler>();
+builder.Services.AddScoped<SBT.GetLastTransactionBalance.IHandler, BT.GetLastTransactionBalanceHandler>();
 builder.Services.AddScoped<SBT.CreateTransaction.IHandler, BT.CreateTransactionHandler>();
 builder.Services.AddScoped<SBT.UpdateTransaction.IHandler, BT.UpdateTransactionHandler>();
 builder.Services.AddScoped<SBT.DeleteTransaction.IHandler, BT.DeleteTransactionHandler>();
