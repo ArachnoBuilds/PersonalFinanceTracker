@@ -15,6 +15,8 @@ public partial class TransactionGrid
     public List<TransactionInfo> Data { get; set; } = [];
     [Parameter]
     public int CurrentMonth { get; set; } = DateTime.Now.Month;
+    [Parameter]
+    public EventCallback<Tuple<DateTime, GridOperation>> OnTransactionChange { get; set; }
 
     RadzenDataGrid<TransactionInfo>? grid;
     readonly BudgetItemType[] budgetItemTypes = [BudgetItemType.Income, BudgetItemType.Expenses, BudgetItemType.Savings];
@@ -99,7 +101,12 @@ public partial class TransactionGrid
         selectedAccount = string.Empty;
     }
 
-    void LoadData() => Data = [.. Data.OrderByDescending(p => p.EffectiveDate)];
+    void LoadData()
+    {
+        var sortedData = Data.OrderByDescending(p => p.EffectiveDate).ToList();
+        Data.Clear();
+        Data.AddRange(sortedData);
+    }
 
     async Task OnAddRowAsync()
     {
@@ -197,6 +204,7 @@ public partial class TransactionGrid
             else
                 Notifier.Notify(NotificationSeverity.Info, $"Please change the month to {transaction.EffectiveDate:MMMM} to view the transaction.", duration: 5000);
             Notifier.Notify(NotificationSeverity.Success, NotificationMessages.TransactionCreationSuccess);
+            await OnTransactionChange.InvokeAsync(new(transaction.EffectiveDate, GridOperation.Create));
         }
         Reset();
     }
@@ -221,6 +229,7 @@ public partial class TransactionGrid
             else
                 Notifier.Notify(NotificationSeverity.Info, $"Please change the month to {transaction.EffectiveDate:MMMM} to view the transaction.", duration: 5000);
             Notifier.Notify(NotificationSeverity.Success, NotificationMessages.TransactionUpdationSuccess);
+            await OnTransactionChange.InvokeAsync(new(transaction.EffectiveDate, GridOperation.Update));
         }
         Reset();
     }
@@ -249,6 +258,7 @@ public partial class TransactionGrid
         {
             Data.Remove(transaction);
             Notifier.Notify(NotificationSeverity.Success, NotificationMessages.TransactionDeletionSuccess);
+            await OnTransactionChange.InvokeAsync(new(transaction.EffectiveDate, GridOperation.Delete));
         }
         await grid.Reload();
     }
